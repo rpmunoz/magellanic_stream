@@ -1,0 +1,25 @@
+#  im_file        filter  tile  dither  sky_level   FWHM
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d1_z.fits    z    5    1    12101.4    4.6
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d2_z.fits    z    5    2    11717.7    4.3
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d3_z.fits    z    5    3    12098.7    4.5
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d4_z.fits    z    5    4    12435.6    4.3
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d5_z.fits    z    5    5    12638.7    4.4
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d6_z.fits    z    5    6    13096.1    4.5
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d7_z.fits    z    5    7    13251.4    4.3
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d8_z.fits    z    5    8    13767.8    4.4
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d9_z.fits    z    5    9    14637.1    4.3
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d10_z.fits    z    5    10    15770.3    4.6
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d11_z.fits    z    5    11    16903.4    4.3
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t5_d12_z.fits    z    5    12    16874.9    4.2
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d1_z.fits    z    3    1    15878.5    3.6
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d2_z.fits    z    3    2    16062.0    3.8
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d3_z.fits    z    3    3    16772.3    3.9
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d4_z.fits    z    3    4    17324.8    4.0
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d5_z.fits    z    3    5    18708.4    3.9
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d6_z.fits    z    3    6    19265.6    3.9
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d7_z.fits    z    3    7    20425.1    3.7
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d8_z.fits    z    3    8    20558.0    3.8
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d9_z.fits    z    3    9    19731.1    3.9
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d10_z.fits    z    3    10    21801.4    3.8
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t3_d11_z.fits    z    3    11    23388.7    4.1
+/Volumes/RAID/Magellanic_stream/DECam/20131115/pipeline/images/ms_t9_d1_z.fits    z    9    1    24274.6    4.1

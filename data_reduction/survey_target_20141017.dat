@@ -1,0 +1,3 @@
+#  im_file        filter  tile  dither  weight_file     zp      FWHM    MJD   EXPTIME   NCHIP
+c4d_141018_041009_ooi_g_v1.fits.fz    g    7    1    c4d_141018_041009_oow_g_v1.fits.fz    32.72     0.0    56948.166187    600.0    60
+c4d_141018_042040_ooi_g_v1.fits.fz    g    9    1    c4d_141018_042040_oow_g_v1.fits.fz    32.77     0.0    56948.173462    600.0    60
