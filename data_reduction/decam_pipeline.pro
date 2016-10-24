@@ -1842,66 +1842,6 @@ if recipe EQ 'psfex' then begin
 
 					filter_sex_cat, sex_stack_cat_psfex_file, psfex_stack_cat_file, class='stars'
 
-; Here we send the filename and define the stellar locus
-			
-;					cat_data=mrdfits(sex_stack_cat_psfex_file, 2, cat_h, COLUMNS=['X_IMAGE','Y_IMAGE','ALPHA_J2000','DELTA_J2000','MAG_AUTO','FLUX_RADIUS','FLUX_APER','FLAGS','ELONGATION'])
-;					gv_stars=where(cat_data.flags LE 3 AND cat_data.mag_auto GE sex_mag_range[0] AND cat_data.mag_auto LT sex_mag_range[1], n_gv_stars)
-;			
-;					plot, cat_data.flux_radius, cat_data.mag_auto, psym=1, xrange=[1,6], yrange=plot_mag_range
-;					oplot, cat_data[gv_stars].flux_radius, cat_data[gv_stars].mag_auto, psym=1, color=100
-;					oplot, [0,100], sex_mag_range[0]*[1,1], line=2, color=100
-;					oplot, [0,100], sex_mag_range[1]*[1,1], line=2, color=100
-;				
-;					plothist, cat_data[gv_stars].flux_radius, temp_xhist, temp_yhist, bin=sex_radius_bin, /noplot
-;					temp=max(temp_yhist, gv) & sex_radius=temp_xhist[gv]
-;					sex_radius=median((cat_data[where(cat_data.mag_auto GT sex_mag_range[0] AND cat_data.mag_auto LT sex_mag_range[1] AND cat_data.flux_radius GT sex_radius*0.9 AND cat_data.flux_radius LT sex_radius*1.1 , n_gv)]).flux_radius)
-;				
-;					oplot, sex_radius*[1,1], [0,100], color=200
-;					oplot, sex_radius*[0.9,0.9], [0,100], line=2, color=200
-;					oplot, sex_radius*[1.1,1.1], [0,100], line=2, color=200
-;				
-;					gv_stars=where(cat_data.mag_auto GT sex_mag_range[0] AND cat_data.mag_auto LT sex_mag_range[1]-1 AND cat_data.flux_radius GT sex_radius*0.9 AND cat_data.flux_radius LT sex_radius*1.1 AND cat_data.flags LE sex_flag_max AND cat_data.x_image GT vig_diam/2. AND cat_data.x_image LT (im_size[0]-vig_diam/2.) AND cat_data.y_image GT vig_diam/2. AND cat_data.y_image LT (im_size[1]-vig_diam/2.), n_gv_stars)
-;					oplot, cat_data[gv_stars].flux_radius, cat_data[gv_stars].mag_auto, psym=1, color=200
-;
-;					mag_range=[min(cat_data[gv_stars].mag_auto)+0.5,max(cat_data[gv_stars].mag_auto)]
-;		
-;; Here we the return the indices from the selection
-;	
-;					print, 'Number of selected stars ', n_gv_stars
-;					print, 'Check WHY the stellar locus is so distorded in tile 1 - z band'
-;			
-;					fits_open, sex_stack_cat_psfex_file, cat_fcb
-;					fits_read, cat_fcb, cat_data0, cat_h0, exten=0
-;					fits_read, cat_fcb, cat_data1, cat_h1, exten=1
-;			
-;					cat_data2=make_array(cat_fcb.axis[0:1,2], value=0, /byte)	
-;					temp_lines=10000L
-;					temp_max=double(product(cat_fcb.axis[0:1,2])-1.)
-;					l=0L
-;					repeat begin
-;						print, 'Reading line ', strn(l*temp_lines), ' of ', strn(cat_fcb.axis[1,2])
-;						l1=double(l*temp_lines*cat_fcb.axis[0,2])
-;						l2=double((l+1)*temp_lines*cat_fcb.axis[0,2] - 1) < temp_max
-;						fits_read, cat_fcb, temp_data, cat_h2, first=l1, last=l2, exten_no=2
-;						cat_data2[*,l1/cat_fcb.axis[0,2]:(l2+1)/cat_fcb.axis[0,2]-1]=reform(temp_data, [cat_fcb.axis[0,2],(l2-l1+1)/cat_fcb.axis[0,2]])
-;						l++
-;					endrep until double(l*temp_lines*cat_fcb.axis[0,2]) GT temp_max
-;					temp_data=0
-;					fits_close, cat_fcb
-;			
-;					cat_data1=reform(cat_data1, [n_elements(cat_data1),1])
-;					cat_data2=cat_data2[*,[gv_stars]]
-;					fxaddpar, cat_h2, 'NAXIS2', (size(cat_data2, /dim))[1]
-;			
-;			
-;					if file_test(psfex_stack_cat_file, /regular, /noexpand) then  file_delete, psfex_stack_cat_file, /noexpand
-;					writefits, psfex_stack_cat_file, cat_data0, cat_h0
-;					fits_open, psfex_stack_cat_file, cat_fcb, /append
-;					fits_write, cat_fcb, cat_data1, cat_h1
-;					fits_write, cat_fcb, cat_data2, cat_h2
-;					fits_close, cat_fcb
-;					cat_data0=0 & cat_data1=0 & cat_data2=0
-
 					command='psfex '+psfex_stack_cat_file+' -c psfex_config/ctio_decam.psfex'+' -PSF_DIR '+output_stack_psfex_dir+' -WRITE_XML Y -XML_NAME '+psfex_stack_xml_file+' -CHECKIMAGE_TYPE NONE '+' -CHECKIMAGE_NAME '+psfex_check_file+' -CHECKPLOT_DEV PNG -CHECKPLOT_TYPE '+psfex_checkplot_type+' -CHECKPLOT_NAME '+psfex_checkplot_file+' -PSFVAR_NSNAP '+psfex_psfvar_nsnap+' -PSFVAR_DEGREES '+psfex_psfvar_degrees+' -BASIS_TYPE '+psfex_basis_type+' -BASIS_NUMBER '+psfex_basis_number+' -SAMPLE_VARIABILITY 1.,1. -SAMPLE_MAXELLIP 1. -NEWBASIS_TYPE NONE -NEWBASIS_NUMBER 10 -SAMPLEVAR_TYPE NONE -STABILITY_TYPE EXPOSURE -SAMPLE_MINSN 1. -SAMPLE_FWHMRANGE 0.1,10. -SAMPLE_AUTOSELECT N -PSF_SIZE '+psfex_psf_size+' -PSF_SAMPLING '+psfex_psf_sampling+' -PSF_ACCURACY 0.01 -BADPIXEL_FILTER Y -BADPIXEL_NMAX 80'
 					print, command
 					spawn, command
