@@ -1553,8 +1553,8 @@ if recipe EQ 'scamp' then begin
 endif else $
 if recipe EQ 'swarp' then begin
 
-  swarp_combine_type='CLIPPED'
-  swarp_resampling_type='LANCZOS2'
+	swarp_combine_type='CLIPPED'
+	swarp_resampling_type='LANCZOS2'
 	swarp_weight_suffix='.WEIGHT.fits'
 	swarp_verbose='NORMAL'
 	swarp_resample_do='Y'
@@ -1570,15 +1570,15 @@ if recipe EQ 'swarp' then begin
 			if do_dither then input_dither_full=string(input_target[gv].dither) $
 			else input_dither_full='ALL'
 
-      if do_align_fwhm NE '' then begin
+     	if do_align_fwhm NE '' then begin
 		
 				swarp_alignref_h=list()	
 				for k=0L, n_elements(input_align_fwhm_full)-1 do begin
 
-        	swarp_list_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.lst'
-      	  swarp_im_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.fits'
-      	  swarp_weight_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.WEIGHT.fits'
-      	  swarp_xml_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.xml'
+				  swarp_list_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.lst'
+					swarp_im_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.fits'
+					swarp_weight_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.WEIGHT.fits'
+					swarp_xml_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.xml'
 
 					gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GE (input_align_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LT (input_align_fwhm_full[k])[1]/0.2637, n_gv)
 
@@ -1612,7 +1612,7 @@ if recipe EQ 'swarp' then begin
 					print
 					print, 'SWARP - Filtering dither number of ', input_dither_full[l]
 	
-					swarp_list_file=output_stack_swarp_dir+'/swarp_decam_'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.dat'
+					swarp_list_file=output_stack_swarp_dir+'/swarp_decam_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.dat'
 		
 					swarp_im_out=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
 					swarp_weight_out=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0  ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
@@ -1697,7 +1697,7 @@ if recipe EQ 'swarp' then begin
             			printf, lun, swarp_alignref_h[m], FORMAT='(A)'
             			close, lun, /all
 	
-									forprint, input_target[gv].swarp_im_file, textout=swarp_list_file, FORMAT='(A)', /NOCOMMENT
+									forprint, input_target[gv].swarp_im_file, textout=swarp_align_list_file, FORMAT='(A)', /NOCOMMENT
 		
 									command='swarp @'+swarp_align_list_file+' -c swarp_config/ctio_decam.swarp'+' -IMAGEOUT_NAME '+swarp_align_im_out+' -WEIGHTOUT_NAME '+swarp_align_weight_out+' -COMBINE_TYPE '+swarp_combine_type+' -RESAMPLE '+swarp_resample_do+' -RESAMPLE_DIR '+swarp_resample_dir+' -SATLEV_DEFAULT 35000 -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_SUFFIX '+swarp_weight_suffix+' -WEIGHT_THRESH 0. -RESCALE_WEIGHTS N -BLANK_BADPIXELS Y -WRITE_XML Y -XML_NAME '+swarp_align_xml_file+' -VERBOSE_TYPE ' +swarp_verbose+' -RESAMPLING_TYPE '+swarp_resampling_type+' -SUBTRACT_BACK Y -BACK_SIZE 384'
 									print, command
