@@ -217,8 +217,12 @@ if n_elements(input_target) GT 0 then begin
 	else stop
 	wait, 1
 
+	gv=where(input_target.exptime GT 100, n_gv)
+	if n_gv GT 0 then input_target=input_target[gv] $
+	else stop
+
 	print, 'PIPELINE - The following files will be used'
-	forprint, input_target.im_file, input_target.tile, input_target.filter, FORMAT='A,2X,A,2X,A', textout=2 
+	forprint, input_target.im_file, input_target.tile, input_target.filter, input_target.exptime, FORMAT='A,2X,A,2X,A,2X,F0.1', textout=2 
 	wait, 1
 
 endif
@@ -381,8 +385,8 @@ if recipe EQ 'database' then begin
 
 	for ii=0L, n_elements(do_program)-1 do begin
 
-		im_file=file_search(input_im_dir[ii], '*.fz')
-		n_im_file=n_elements(im_file)
+		; Processing Science images
+		im_file=file_search(input_im_dir[ii], '*.fz', count=n_im_file)
 	
 		create_struct, temp_target, '', ['dir','im_file','weight_file','expnum','type','date','ra','dec','mjd','mjd_floor','exptime','tile','dither','filter','zp','fwhm','n_chip'], 'A,A,A,I,A,A,D,D,D,D,F,A,A,A,F,F,I', dim=1
 	
@@ -468,7 +472,37 @@ if recipe EQ 'database' then begin
 			free_lun, lun
 		endif
 	
+		; Processing Calibration images
 		im_file=file_search(input_calib_dir[ii], '*.fz', count=n_im_file)
+
+		create_struct, temp_target, '', ['dir','im_file','weight_file','expnum','type','date','ra','dec','mjd','mjd_floor','exptime','tile','dither','filter','zp','fwhm','n_chip'], 'A,A,A,I,A,A,D,D,D,D,F,A,A,A,F,F,I', dim=1
+	
+		for i=0L, n_im_file-1 do begin
+			print, 'DATABASE - Processing file ', (strsplit(im_file[i],'/',/extract))[-1]
+	
+			im_h=headfits(im_file[i])
+			fits_info, im_file[i], n_ext=n_ext, /silent
+			temp_target.dir=input_im_dir[ii]
+			temp_target.im_file=(strsplit(im_file[i],'/',/extract))[-1]
+			temp_target.expnum=fxpar(im_h, 'EXPNUM')
+			temp_target.type=strtrim(fxpar(im_h, 'PRODTYPE'),2)
+			temp_target.date=fxpar(im_h, 'DATE-OBS')
+			temp_target.mjd=fxpar(im_h, 'MJD-OBS')
+			temp_target.mjd_floor=floor(fxpar(im_h, 'MJD-OBS')+0.2)
+			temp_target.ra=ten(fxpar(im_h, 'RA'))*360./24.
+			temp_target.dec=ten(fxpar(im_h, 'DEC'))
+			temp_target.exptime=float(fxpar(im_h, 'EXPTIME'))
+			temp_target.filter=strmid(fxpar(im_h, 'FILTER'),0,1)
+			temp=size(fxpar(im_h, 'MAGZERO'),/type)
+			temp_target.zp= (temp EQ 4 OR temp EQ 5) ? fxpar(im_h, 'MAGZERO') : 31.5
+			temp_target.n_chip=n_ext
+	
+			if i EQ 0 then input_target=temp_target else input_target=[input_target,temp_target]
+		endfor
+		gv_sort=sort(input_target.date+' '+input_target.type)
+
+
+
 		im_date=list()
 		im_type=list()
 
@@ -1439,9 +1473,9 @@ if recipe EQ 'scamp' then begin
 		if scamp_n_ext EQ input_target[i].n_chip*2 AND do_overwrite EQ 0 then continue
 
 		fits_open, input_target[i].sex_cat_file, fcb_in  ; Lee la tabla fits sin intervenerla           
-	  fits_read, fcb_in, cat_data0, cat_h0, exten=0 
+		fits_read, fcb_in, cat_data0, cat_h0, exten=0 
 ;		fxaddpar, cat_h0, 'FILTER', input_target[i].filter
-  	writefits, input_target[i].scamp_cat_file, cat_data0, cat_h0
+		writefits, input_target[i].scamp_cat_file, cat_data0, cat_h0
 
 		for j=0L, input_target[i].n_chip-1 do begin
 			cat_sex=mrdfits(input_target[i].sex_cat_file, 2*(j+1), cat_sex_h, COLUMNS=['NUMBER','FLUX_RADIUS','MAG_AUTO','MAGERR_AUTO','FLAGS','A_IMAGE','B_IMAGE'], /silent)
@@ -1553,8 +1587,8 @@ if recipe EQ 'scamp' then begin
 endif else $
 if recipe EQ 'swarp' then begin
 
-  swarp_combine_type='CLIPPED'
-  swarp_resampling_type='LANCZOS2'
+	swarp_combine_type='CLIPPED'
+	swarp_resampling_type='LANCZOS2'
 	swarp_weight_suffix='.WEIGHT.fits'
 	swarp_verbose='NORMAL'
 	swarp_resample_do='Y'
@@ -1570,15 +1604,15 @@ if recipe EQ 'swarp' then begin
 			if do_dither then input_dither_full=string(input_target[gv].dither) $
 			else input_dither_full='ALL'
 
-      if do_align_fwhm NE '' then begin
+     	if do_align_fwhm NE '' then begin
 		
 				swarp_alignref_h=list()	
 				for k=0L, n_elements(input_align_fwhm_full)-1 do begin
 
-        	swarp_list_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.lst'
-      	  swarp_im_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.fits'
-      	  swarp_weight_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.WEIGHT.fits'
-      	  swarp_xml_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.xml'
+				  swarp_list_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.lst'
+					swarp_im_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.fits'
+					swarp_weight_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.WEIGHT.fits'
+					swarp_xml_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.xml'
 
 					gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GE (input_align_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LT (input_align_fwhm_full[k])[1]/0.2637, n_gv)
 
@@ -1612,7 +1646,7 @@ if recipe EQ 'swarp' then begin
 					print
 					print, 'SWARP - Filtering dither number of ', input_dither_full[l]
 	
-					swarp_list_file=output_stack_swarp_dir+'/swarp_decam_'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.dat'
+					swarp_list_file=output_stack_swarp_dir+'/swarp_decam_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.dat'
 		
 					swarp_im_out=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
 					swarp_weight_out=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0  ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
@@ -1697,7 +1731,7 @@ if recipe EQ 'swarp' then begin
             			printf, lun, swarp_alignref_h[m], FORMAT='(A)'
             			close, lun, /all
 	
-									forprint, input_target[gv].swarp_im_file, textout=swarp_list_file, FORMAT='(A)', /NOCOMMENT
+									forprint, input_target[gv].swarp_im_file, textout=swarp_align_list_file, FORMAT='(A)', /NOCOMMENT
 		
 									command='swarp @'+swarp_align_list_file+' -c swarp_config/ctio_decam.swarp'+' -IMAGEOUT_NAME '+swarp_align_im_out+' -WEIGHTOUT_NAME '+swarp_align_weight_out+' -COMBINE_TYPE '+swarp_combine_type+' -RESAMPLE '+swarp_resample_do+' -RESAMPLE_DIR '+swarp_resample_dir+' -SATLEV_DEFAULT 35000 -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_SUFFIX '+swarp_weight_suffix+' -WEIGHT_THRESH 0. -RESCALE_WEIGHTS N -BLANK_BADPIXELS Y -WRITE_XML Y -XML_NAME '+swarp_align_xml_file+' -VERBOSE_TYPE ' +swarp_verbose+' -RESAMPLING_TYPE '+swarp_resampling_type+' -SUBTRACT_BACK Y -BACK_SIZE 384'
 									print, command
@@ -1909,7 +1943,7 @@ if recipe EQ 'report' then begin
 			gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE fwhm_max/0.2637, n_gv)
 			gv=gv[sort(input_target[gv].fwhm)]
 			print, 'Filename		Tile		Filter		FWHM(arsec)'
-			forprint, input_target[gv].im_file, input_target[gv].tile , input_target[gv].filter, input_target[gv].fwhm*0.2637, textout=2, format='A,2X,A,2X,A,2X,F0.2'
+			forprint, input_target[gv].im_file, input_target[gv].tile , input_target[gv].filter, input_target[gv].fwhm*0.2637, input_target[gv].exptime, textout=2, format='A,2X,A,2X,A,2X,F0.2,2X,F0.1'
 
 			exptime_total=total(input_target[gv].exptime)
 			exptime_uniq=input_target[gv[uniq(input_target[gv].exptime, sort(input_target[gv].exptime))]].exptime
