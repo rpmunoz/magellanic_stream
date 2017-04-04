@@ -25,7 +25,7 @@ output_dir='/Volumes/RAID/Magellanic_stream/DECam'
 
 do_program_full=strsplit(do_program,',', /extract)
 if do_program EQ 'ALL' then begin
-	temp_program=strsplit(file_search(input_dir+'/*', /TEST_DIRECTORY),'/',/extract)
+	temp_program=strsplit(file_search(input_dir+'/*', /TEST_DIRECTORY),'/', /extract)
 	do_program=strarr(n_elements(temp_program))
 	for i=0L, n_elements(temp_program)-1 do do_program[i]=(temp_program[i])[-1]
 	gv=where(do_program NE 'stacks' AND do_program NE 'pipeline', n_gv)
@@ -41,9 +41,14 @@ input_chip_fwhm=[28,35] ; Where to measure FWHM
 input_chip_flux_radius=[27,28,29,34,35,36] ; Where to measure FWHM
 input_chip_iq=[27,28,35,36] ; Where to measure FWHM
 
-if stregex(do_fwhm,'-') GT 0 then begin
+if stregex(do_fwhm,'-') GT 0 AND stregex(do_fwhm,',') GT 0 then begin
 	do_fwhm_type='range'
 	input_fwhm_full=strsplit(strsplit(do_fwhm,',', /extract),'-', /extract)
+endif else $
+if stregex(do_fwhm,'-') GT 0 then begin
+	do_fwhm_type='range'
+	input_fwhm_full=list()
+	input_fwhm_full.add, strsplit(strsplit(do_fwhm,',', /extract),'-', /extract)
 endif else $
 if stregex(do_fwhm,',') GT 0 then begin
 	do_fwhm_type='limit'
@@ -336,7 +341,7 @@ if n_elements(input_calib) GT 0 then begin
 
 	do_filter_split=strsplit(do_filter,',', /extract)
 	if n_elements(do_filter_split) GT 1 then begin
-		gv=where( total(rebin(byte(input_calib.filter),[2,n_elements(input_calib.filter)]) EQ rebin(transpose(byte(do_filter_split)),[2,n_elements(input_calib.filter)]),1) GT 0, n_gv)
+		gv=where( total( rebin(byte(input_calib.filter),[n_elements(do_filter_split),n_elements(input_calib.filter)]) EQ rebin(transpose(byte(do_filter_split)),[n_elements(do_filter_split),n_elements(input_calib.filter)]),1) GT 0, n_gv)
 		if n_gv GT 0 then input_calib=input_calib[gv] $
 		else stop
 	endif $
@@ -1932,32 +1937,44 @@ if recipe EQ 'report' then begin
 	
 	for i=0L, n_elements(tile_uniq)-1 do begin
 		for j=0L, n_elements(filter_uniq)-1 do begin
+			for k=0L, n_elements(input_fwhm_full)-1 do begin
 
-			case filter_uniq[j] of
-				'g': fwhm_max=2.0 ; 1.7 ; arcsec
-				'i': fwhm_max=2.0 ; 1.6
-				'z': fwhm_max=2.0 ; 1.6
-				else: stop
-			endcase
-			
-			gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE fwhm_max/0.2637, n_gv)
-			gv=gv[sort(input_target[gv].fwhm)]
-			print, 'Filename		Tile		Filter		FWHM(arsec)'
-			forprint, input_target[gv].im_file, input_target[gv].tile , input_target[gv].filter, input_target[gv].fwhm*0.2637, input_target[gv].exptime, textout=2, format='A,2X,A,2X,A,2X,F0.2,2X,F0.1'
-
-			exptime_total=total(input_target[gv].exptime)
-			exptime_uniq=input_target[gv[uniq(input_target[gv].exptime, sort(input_target[gv].exptime))]].exptime
-
-			print, tile_uniq[i], filter_uniq[j], exptime_total, n_gv, fwhm_max, FORMAT='("Tile: ",I2," - Filter: ",A," - Total exptime: ",I5," s - Number of images: ", I3," - FWHM <= ", F0.1, " arcsec")'
-			for k=0L, n_elements(exptime_uniq)-1 do begin
-				gv_exptime=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE fwhm_max/0.2637 AND input_target.exptime EQ exptime_uniq[k], n_gv_exptime)
-				print, n_gv_exptime, exptime_uniq[k], FORMAT='("- ", I2," images with exposure time of ", I3, " seconds")'
+				case do_fwhm_type of
+					'limit': gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE input_fwhm_full[k]/0.2637, n_gv)
+					'range': gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GT (input_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LE (input_fwhm_full[k])[1]/0.2637, n_gv)
+					else: stop
+				endcase
 				
-			endfor
+				gv=gv[sort(input_target[gv].fwhm)]
+				;print, 'Filename		Tile		Filter		FWHM(arsec)'
+				;forprint, input_target[gv].im_file, input_target[gv].tile , input_target[gv].filter, input_target[gv].fwhm*0.2637, input_target[gv].exptime, textout=2, format='A,2X,A,2X,A,2X,F0.2,2X,F0.1'
 
+				exptime_total=total(input_target[gv].exptime)
+				exptime_uniq=input_target[gv[uniq(input_target[gv].exptime, sort(input_target[gv].exptime))]].exptime
+
+				case do_fwhm_type of
+					'limit': print, tile_uniq[i], filter_uniq[j], exptime_total, n_gv, input_fwhm_full[k], FORMAT='("Tile: ",I2," - Filter: ",A," - Total exptime: ",I5," s - Number of images: ", I3," - FWHM < ", A, " arcsec")'
+					'range': print, tile_uniq[i], filter_uniq[j], exptime_total, n_gv, (input_fwhm_full[k])[0], (input_fwhm_full[k])[1], FORMAT='("Tile: ",I2," - Filter: ",A," - Total exptime: ",I5," s - Number of images: ", I3," - FWHM = ", F0.1, "-", F0.1, " arcsec")'
+					else: stop
+				endcase
+
+				for l=0L, n_elements(exptime_uniq)-1 do begin
+
+					case do_fwhm_type of
+						'limit': gv_exptime=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE input_fwhm_full[k]/0.2637 AND input_target.exptime EQ exptime_uniq[l], n_gv_exptime)					
+						'range': gv_exptime=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GT (input_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LE (input_fwhm_full[k])[1]/0.2637 AND input_target.exptime EQ exptime_uniq[l], n_gv_exptime)
+						else: stop
+					endcase
+
+;					gv_exptime=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE fwhm_max/0.2637 AND input_target.exptime EQ exptime_uniq[k], n_gv_exptime)
+					print, n_gv_exptime, exptime_uniq[l], FORMAT='("- ", I2," images with exposure time of ", I3, " seconds")'
+					
+				endfor
+			endfor
 		endfor
 		print
 	endfor
+
 stop
 
 if do_fwhm EQ 99. then plot_yrange=[0,24] else plot_yrange=[0,16]

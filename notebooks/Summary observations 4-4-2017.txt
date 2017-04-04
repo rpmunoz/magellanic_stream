@@ -1,0 +1,136 @@
+Tile:  1 - Filter: g - Total exptime:  3000 s - Number of images:   5 - FWHM = 0.0-1.6 arcsec
+-  5 images with exposure time of 600 seconds
+Tile:  1 - Filter: g - Total exptime:  1800 s - Number of images:   3 - FWHM = 1.6-2.0 arcsec
+-  3 images with exposure time of 600 seconds
+Tile:  1 - Filter: i - Total exptime:  4800 s - Number of images:   8 - FWHM = 0.0-1.6 arcsec
+-  8 images with exposure time of 600 seconds
+Tile:  1 - Filter: i - Total exptime:  2400 s - Number of images:   4 - FWHM = 1.6-2.0 arcsec
+-  4 images with exposure time of 600 seconds
+Tile:  1 - Filter: z - Total exptime: 10040 s - Number of images:  21 - FWHM = 0.0-1.6 arcsec
+-  8 images with exposure time of 330 seconds
+-  2 images with exposure time of 400 seconds
+- 11 images with exposure time of 600 seconds
+Tile:  1 - Filter: z - Total exptime:  1320 s - Number of images:   4 - FWHM = 1.6-2.0 arcsec
+-  4 images with exposure time of 330 seconds
+
+Tile:  2 - Filter: g - Total exptime:  3600 s - Number of images:   6 - FWHM = 0.0-1.6 arcsec
+-  6 images with exposure time of 600 seconds
+Tile:  2 - Filter: g - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  2 - Filter: i - Total exptime:  6300 s - Number of images:  13 - FWHM = 0.0-1.6 arcsec
+-  5 images with exposure time of 300 seconds
+-  8 images with exposure time of 600 seconds
+Tile:  2 - Filter: i - Total exptime:   600 s - Number of images:   1 - FWHM = 1.6-2.0 arcsec
+-  1 images with exposure time of 600 seconds
+Tile:  2 - Filter: z - Total exptime: 10000 s - Number of images:  33 - FWHM = 0.0-1.6 arcsec
+- 32 images with exposure time of 300 seconds
+-  1 images with exposure time of 400 seconds
+Tile:  2 - Filter: z - Total exptime:  3600 s - Number of images:   9 - FWHM = 1.6-2.0 arcsec
+-  9 images with exposure time of 400 seconds
+
+Tile:  3 - Filter: g - Total exptime:  3600 s - Number of images:   6 - FWHM = 0.0-1.6 arcsec
+-  6 images with exposure time of 600 seconds
+Tile:  3 - Filter: g - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  3 - Filter: i - Total exptime:  6900 s - Number of images:  14 - FWHM = 0.0-1.6 arcsec
+-  5 images with exposure time of 300 seconds
+-  9 images with exposure time of 600 seconds
+Tile:  3 - Filter: i - Total exptime:  2400 s - Number of images:   4 - FWHM = 1.6-2.0 arcsec
+-  4 images with exposure time of 600 seconds
+Tile:  3 - Filter: z - Total exptime: 10100 s - Number of images:  22 - FWHM = 0.0-1.6 arcsec
+-  7 images with exposure time of 300 seconds
+-  5 images with exposure time of 400 seconds
+- 10 images with exposure time of 600 seconds
+Tile:  3 - Filter: z - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+
+Tile:  4 - Filter: g - Total exptime:  3600 s - Number of images:   6 - FWHM = 0.0-1.6 arcsec
+-  6 images with exposure time of 600 seconds
+Tile:  4 - Filter: g - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  4 - Filter: i - Total exptime:  6000 s - Number of images:  15 - FWHM = 0.0-1.6 arcsec
+- 10 images with exposure time of 300 seconds
+-  5 images with exposure time of 600 seconds
+Tile:  4 - Filter: i - Total exptime:  5400 s - Number of images:  11 - FWHM = 1.6-2.0 arcsec
+-  4 images with exposure time of 300 seconds
+-  7 images with exposure time of 600 seconds
+Tile:  4 - Filter: z - Total exptime: 10200 s - Number of images:  34 - FWHM = 0.0-1.6 arcsec
+- 34 images with exposure time of 300 seconds
+Tile:  4 - Filter: z - Total exptime:  3200 s - Number of images:   8 - FWHM = 1.6-2.0 arcsec
+-  8 images with exposure time of 400 seconds
+
+Tile:  5 - Filter: g - Total exptime:  3600 s - Number of images:   6 - FWHM = 0.0-1.6 arcsec
+-  6 images with exposure time of 600 seconds
+Tile:  5 - Filter: g - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  5 - Filter: i - Total exptime:  5400 s - Number of images:  13 - FWHM = 0.0-1.6 arcsec
+-  2 images with exposure time of 150 seconds
+-  5 images with exposure time of 300 seconds
+-  6 images with exposure time of 600 seconds
+Tile:  5 - Filter: i - Total exptime:  5400 s - Number of images:  12 - FWHM = 1.6-2.0 arcsec
+-  6 images with exposure time of 300 seconds
+-  6 images with exposure time of 600 seconds
+Tile:  5 - Filter: z - Total exptime: 12200 s - Number of images:  32 - FWHM = 0.0-1.6 arcsec
+- 10 images with exposure time of 200 seconds
+- 10 images with exposure time of 300 seconds
+- 12 images with exposure time of 600 seconds
+Tile:  5 - Filter: z - Total exptime:   300 s - Number of images:   1 - FWHM = 1.6-2.0 arcsec
+-  1 images with exposure time of 300 seconds
+
+Tile:  6 - Filter: g - Total exptime:  3600 s - Number of images:   6 - FWHM = 0.0-1.6 arcsec
+-  6 images with exposure time of 600 seconds
+Tile:  6 - Filter: g - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  6 - Filter: i - Total exptime:  4800 s - Number of images:  13 - FWHM = 0.0-1.6 arcsec
+- 10 images with exposure time of 300 seconds
+-  3 images with exposure time of 600 seconds
+Tile:  6 - Filter: i - Total exptime:  6300 s - Number of images:  14 - FWHM = 1.6-2.0 arcsec
+-  7 images with exposure time of 300 seconds
+-  7 images with exposure time of 600 seconds
+Tile:  6 - Filter: z - Total exptime: 10000 s - Number of images:  33 - FWHM = 0.0-1.6 arcsec
+- 32 images with exposure time of 300 seconds
+-  1 images with exposure time of 400 seconds
+Tile:  6 - Filter: z - Total exptime:  4200 s - Number of images:  11 - FWHM = 1.6-2.0 arcsec
+-  2 images with exposure time of 300 seconds
+-  9 images with exposure time of 400 seconds
+
+Tile:  7 - Filter: g - Total exptime:  3300 s - Number of images:   7 - FWHM = 0.0-1.6 arcsec
+-  3 images with exposure time of 300 seconds
+-  4 images with exposure time of 600 seconds
+Tile:  7 - Filter: g - Total exptime:  2400 s - Number of images:   4 - FWHM = 1.6-2.0 arcsec
+-  4 images with exposure time of 600 seconds
+Tile:  7 - Filter: i - Total exptime:  4800 s - Number of images:   8 - FWHM = 0.0-1.6 arcsec
+-  8 images with exposure time of 600 seconds
+Tile:  7 - Filter: i - Total exptime:   600 s - Number of images:   1 - FWHM = 1.6-2.0 arcsec
+-  1 images with exposure time of 600 seconds
+Tile:  7 - Filter: z - Total exptime:  2500 s - Number of images:   7 - FWHM = 0.0-1.6 arcsec
+-  3 images with exposure time of 300 seconds
+-  4 images with exposure time of 400 seconds
+Tile:  7 - Filter: z - Total exptime:  2400 s - Number of images:   6 - FWHM = 1.6-2.0 arcsec
+-  6 images with exposure time of 400 seconds
+
+Tile:  8 - Filter: g - Total exptime:  1800 s - Number of images:   3 - FWHM = 0.0-1.6 arcsec
+-  3 images with exposure time of 600 seconds
+Tile:  8 - Filter: g - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  8 - Filter: i - Total exptime:  2400 s - Number of images:   4 - FWHM = 0.0-1.6 arcsec
+-  4 images with exposure time of 600 seconds
+Tile:  8 - Filter: i - Total exptime:  1800 s - Number of images:   3 - FWHM = 1.6-2.0 arcsec
+-  3 images with exposure time of 600 seconds
+Tile:  8 - Filter: z - Total exptime:   600 s - Number of images:   0 - FWHM = 0.0-1.6 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  8 - Filter: z - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+
+Tile:  9 - Filter: g - Total exptime:   600 s - Number of images:   1 - FWHM = 0.0-1.6 arcsec
+-  1 images with exposure time of 600 seconds
+Tile:  9 - Filter: g - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds
+Tile:  9 - Filter: i - Total exptime:  1800 s - Number of images:   3 - FWHM = 0.0-1.6 arcsec
+-  3 images with exposure time of 600 seconds
+Tile:  9 - Filter: i - Total exptime:  1200 s - Number of images:   2 - FWHM = 1.6-2.0 arcsec
+-  2 images with exposure time of 600 seconds
+Tile:  9 - Filter: z - Total exptime:   600 s - Number of images:   2 - FWHM = 0.0-1.6 arcsec
+-  2 images with exposure time of 300 seconds
+Tile:  9 - Filter: z - Total exptime:   600 s - Number of images:   0 - FWHM = 1.6-2.0 arcsec
+-  0 images with exposure time of 300 seconds

@@ -1,0 +1,1 @@
+decam_pipeline, 'report', program='20130808,20131115,20140809,20140909,20141017,20150906', filter='g,i,z', tile='all', fwhm='0.-1.6,1.6-2.0'
