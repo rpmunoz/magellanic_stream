@@ -1,4 +1,4 @@
-# im_file		object	filter	weight_file	T
+# IM_FILE	 			OBJECT		FILTER	WEIGHT_FILE				ZP	FWHM	MJD		EXPTIME
 # Night 1
 tu1843537.fits.fz	SDSSJ2140-0000	g		tu1843007.fits.fz		26.7088	0.	56513.09854498	15.	61	T
 tu1843927.fits.fz	SDSSJ2140-0000	i		tu1844148.fits.fz		28.1376	0.	56513.09904466	15.	61	T

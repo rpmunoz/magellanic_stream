@@ -304,7 +304,7 @@ for i=0L, n_elements(do_program)-1 do begin
 	if file_test('survey_calib_'+do_program[i]+'.dat') AND recipe NE 'database' then begin
 		readcol, 'survey_calib_'+do_program[i]+'.dat', temp_im_orig_file, temp_object, temp_filter, temp_weight_orig_file, temp_zp, temp_fwhm, temp_mjd, temp_exptime, temp_n_chip, temp_photflag, FORMAT='A,A,A,A,F,F,D,F,I,A', COMMENT='#'
 		n_survey=n_elements(temp_im_orig_file)
-		create_struct, temp_input_calib, '', ['im_orig_file','object','filter','tile','weight_orig_file','mjd','mjd_floor','zp','airmass','im_file','weight_file','fwhm','exptime','n_chip','sex_cat_file','sex_xml_file','sex_check_file','sex_zp_file','sex_zp_full_file','photflag','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file'], 'A,A,A,A,A,D,D,F,F,A,A,F,F,I,A,A,A,A,A,A,A,A,A,A,A', dim=n_survey
+		create_struct, temp_input_calib, '', ['im_orig_file','object','filter','tile','weight_orig_file','mjd','mjd_floor','zp','airmass','im_file','weight_file','fwhm','exptime','n_chip','sex_dir','sex_cat_file','sex_xml_file','sex_check_file','sex_zp_file','sex_zp_full_file','photflag','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file'], 'A,A,A,A,A,D,D,F,F,A,A,F,F,I,A,A,A,A,A,A,A,A,A,A,A,A', dim=n_survey
 		temp_input_calib.im_orig_file=input_calib_dir[i]+'/'+repstr(temp_im_orig_file,'.fits.fz','.fits')
 		temp_input_calib.weight_orig_file=input_calib_dir[i]+'/'+repstr(temp_weight_orig_file,'.fits.fz','.fits')
 		temp_input_calib.object=temp_object
@@ -320,6 +320,7 @@ for i=0L, n_elements(do_program)-1 do begin
 		temp_mjd=string(temp_mjd, FORMAT='(F0.8)')
 		temp_input_calib.im_file=output_im_dir[i]+'/'+'standard_'+temp_object+'_'+temp_filter+'_MJD'+temp_mjd+'.fits'
 		temp_input_calib.weight_file=output_im_dir[i]+'/'+'standard_'+temp_object+'_'+temp_filter+'_MJD'+temp_mjd+'.WEIGHT.fits'
+		temp_input_calib.sex_dir=output_sex_dir[i]
 		temp_input_calib.sex_cat_file=output_sex_dir[i]+'/'+'standard_'+temp_object+'_'+temp_filter+'_MJD'+temp_mjd+'.ldac'
 		temp_input_calib.sex_xml_file=output_sex_dir[i]+'/'+'standard_'+temp_object+'_'+temp_filter+'_MJD'+temp_mjd+'.xml'
 		temp_input_calib.sex_check_file=output_sex_check_dir[i]+'/'+'standard_'+temp_object+'_'+temp_filter+'_MJD'+temp_mjd+'.BACKGROUND.fits'
@@ -707,19 +708,19 @@ if recipe EQ 'compute zp' then begin
 
 			for j=0L, n_elements(input_chip_fwhm)-1 do begin
 				im_data=readfits(input_calib[i].im_file, im_h, ext=input_chip_fwhm[j])
-				writefits, sextractor_dir+'/im_sextractor.fits', im_data, im_h
+				writefits, input_calib[i].sex_dir+'/im_sextractor.fits', im_data, im_h
 				wim_data=readfits(input_calib[i].weight_file, wim_h, ext=input_chip_fwhm[j])
-				writefits, sextractor_dir+'/wim_sextractor.fits', wim_data, wim_h
+				writefits, input_calib[i].sex_dir+'/wim_sextractor.fits', wim_data, wim_h
 		
 				im_size=size(im_data, /dim)
 				im_gain=fxpar(im_h, 'GAINA')
 				im_ron=fxpar(im_h, 'RDNOISEA')
 	
-				command = 'sex '+sextractor_dir+'/im_sextractor.fits' +' -c sex_config/ctio_decam.sex -CATALOG_NAME '+sextractor_dir+'/im_sextractor.ldac'+' -WEIGHT_IMAGE '+sextractor_dir+'/wim_sextractor.fits'+' -XML_NAME '+input_calib[i].sex_xml_file+' -SATUR_LEVEL '+sex_satur_level+' -MAG_ZEROPOINT '+string(input_calib[i].zp,FORMAT='(F0.2)')+' -CHECKIMAGE_TYPE BACKGROUND -CHECKIMAGE_NAME '+input_calib[i].sex_check_file
+				command = 'sex '+input_calib[i].sex_dir+'/im_sextractor.fits' +' -c sex_config/ctio_decam.sex -CATALOG_NAME '+input_calib[i].sex_dir+'/im_sextractor.ldac'+' -WEIGHT_IMAGE '+input_calib[i].sex_dir+'/wim_sextractor.fits'+' -XML_NAME '+input_calib[i].sex_xml_file+' -SATUR_LEVEL '+sex_satur_level+' -MAG_ZEROPOINT '+string(input_calib[i].zp,FORMAT='(F0.2)')+' -CHECKIMAGE_TYPE BACKGROUND -CHECKIMAGE_NAME '+input_calib[i].sex_check_file
 				print, command
 				spawn, command
 		
-				cat_sex=mrdfits(sextractor_dir+'/im_sextractor.ldac', 2, cat_sex_h, COLUMNS=['NUMBER','X_IMAGE','Y_IMAGE','FLUX_RADIUS','MAG_AUTO','FLUX_AUTO','FLAGS'], /silent)
+				cat_sex=mrdfits(input_calib[i].sex_dir+'/im_sextractor.ldac', 2, cat_sex_h, COLUMNS=['NUMBER','X_IMAGE','Y_IMAGE','FLUX_RADIUS','MAG_AUTO','FLUX_AUTO','FLAGS'], /silent)
 				plothist, (cat_sex[where(cat_sex.mag_auto GT sex_mag_range[0] and cat_sex.mag_auto LT sex_mag_range[1] AND cat_sex.flux_radius GT sex_flux_radius_min AND cat_sex.flags LT 8, n_gv)]).flux_radius, temp_xhist, temp_yhist, bin=sex_radius_bin, /noplot
 				temp=max(temp_yhist, gv) & sex_radius=temp_xhist[gv]
 				sex_radius=median((cat_sex[where(cat_sex.mag_auto GT sex_mag_range[0] AND cat_sex.mag_auto LT sex_mag_range[1] AND cat_sex.flux_radius GT sex_radius*0.9 AND cat_sex.flux_radius LT sex_radius*1.1 , n_gv)]).flux_radius)
@@ -739,22 +740,22 @@ if recipe EQ 'compute zp' then begin
 					gv_stars=gv_stars[sort(cat_sex[gv_stars].mag_auto)]
 	
 					temp_n=n_gv_stars<5
-	  	    temp_x=cat_sex[gv_stars].x_image
-	   	  	temp_y=cat_sex[gv_stars].y_image
-	
-	  	    for k=0L, temp_n-1 do begin
-		        x_range=[ floor(temp_x[k]-(vig_diam-1.)/2), ceil(temp_x[k]+(vig_diam-1.)/2) ]
-	    	    y_range=[ floor(temp_y[k]-(vig_diam-1.)/2), ceil(temp_y[k]+(vig_diam-1.)/2) ]
-	      	  vig_data = im_data[x_range[0]:x_range[1],y_range[0]:y_range[1]]; - im_sky
+			  	    temp_x=cat_sex[gv_stars].x_image
+			   	  	temp_y=cat_sex[gv_stars].y_image
+			
+			  	    for k=0L, temp_n-1 do begin
+				        x_range=[ floor(temp_x[k]-(vig_diam-1.)/2), ceil(temp_x[k]+(vig_diam-1.)/2) ]
+			    	    y_range=[ floor(temp_y[k]-(vig_diam-1.)/2), ceil(temp_y[k]+(vig_diam-1.)/2) ]
+						vig_data = im_data[x_range[0]:x_range[1],y_range[0]:y_range[1]]; - im_sky
 						vig_size=size(vig_data, /dim)
-	
-		        x_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
-	    	    y_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
+
+						x_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
+						y_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
 						vig_center_data=vig_data[x_center_range[0]:x_center_range[1],y_center_range[0]:y_center_range[1]]
 						vig_center_size=size(vig_center_data, /dim)
-	
-		        im_max=max(vig_center_data, gv_max)
-	        	im_c= [gv_max mod vig_center_size[0], gv_max/vig_center_size[0]]
+
+						im_max=max(vig_center_data, gv_max)
+						im_c= [gv_max mod vig_center_size[0], gv_max/vig_center_size[0]]
 						im_c += [x_center_range[0], y_center_range[0]]
 
 						dist_circle, vig_mask, vig_size, im_c[0], im_c[1]
@@ -772,7 +773,7 @@ if recipe EQ 'compute zp' then begin
 						vig_skyrad=4*vig_fwhm < 40.
 						vig_psfrad=3*vig_fwhm < 50.
 						vig_fitrad=vig_fwhm < 50.
-	
+
 						gcntrd, vig_data, im_c[0], im_c[1], im_cx, im_cy, vig_fwhm
 						dist_circle, vig_mask, vig_size, im_cx, im_cy
 						vig_sky=median(vig_data[where(vig_mask GT vig_skyrad, n_sky)])
@@ -781,18 +782,18 @@ if recipe EQ 'compute zp' then begin
 						oplot, [0,100], max(vig_data-vig_sky)/2.*[1,1], line=2, color=200
 						oplot, vig_fwhm/2.*[1,1], [-1e5,1e5], line=2, color=200
 
-						getpsf, vig_data, im_cx, im_cy, vig_mag, vig_sky, im_ron, im_gain, psf_param, psf_residuals, [0], vig_psfrad, vig_fitrad, sextractor_dir+'/im_sextractor_psf.fits' 
-		        im_fwhm.add, 2*sqrt(2*alog(2))*sqrt( (psf_param[3]^2 + psf_param[4]^2)/2. )
+						getpsf, vig_data, im_cx, im_cy, vig_mag, vig_sky, im_ron, im_gain, psf_param, psf_residuals, [0], vig_psfrad, vig_fitrad, input_calib[i].sex_dir+'/im_sextractor_psf.fits' 
+							im_fwhm.add, 2*sqrt(2*alog(2))*sqrt( (psf_param[3]^2 + psf_param[4]^2)/2. )
 						print, 'FWHM ', im_fwhm[-1],' pixels'
-	
+
 						dist_circle, vig_mask, vig_size, im_cx, im_cy
 						plot, vig_mask, vig_data-vig_sky, xrange=[0,30], psym=1
 						x=findgen(100)/10.
 						y=gaussian(x,[psf_param[0], 0., mean(psf_param[3:4])])
 						oplot, x, y, line=2, color=200
 						oplot, im_fwhm[-1]/2.*[1,1], [-1e5,1e5], line=2, color=200
-						
-	  	  	endfor
+								
+					endfor
 				endif	
 	
 			endfor
@@ -819,7 +820,7 @@ if recipe EQ 'compute zp' then begin
 ;
 ;		if sex_n_ext NE input_n_chip*2 OR do_overwrite EQ 1 then begin
 
-			command = 'sex '+input_calib[i].im_file +' -c sex_config/ctio_decam.sex -CATALOG_NAME '+input_calib[i].sex_cat_file+' -WEIGHT_IMAGE '+input_calib[i].weight_file+' -XML_NAME '+input_calib[i].sex_xml_file+' -SATUR_LEVEL '+sex_satur_level+' -MAG_ZEROPOINT '+string(input_calib[i].zp,FORMAT='(F0.2)')+' -CHECKIMAGE_TYPE BACKGROUND -CHECKIMAGE_NAME '+input_calib[i].sex_check_file+' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*im_fwhm, FORMAT='(F0.2)'),',')
+			command = 'sex '+input_calib[i].im_file +' -c sex_config/ctio_decam_stack.sex -CATALOG_NAME '+input_calib[i].sex_cat_file+' -WEIGHT_IMAGE '+input_calib[i].weight_file+' -XML_NAME '+input_calib[i].sex_xml_file+' -SATUR_LEVEL '+sex_satur_level+' -MAG_ZEROPOINT '+string(input_calib[i].zp,FORMAT='(F0.2)')+' -CHECKIMAGE_TYPE BACKGROUND -CHECKIMAGE_NAME '+input_calib[i].sex_check_file+' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*im_fwhm, FORMAT='(F0.2)'),',')
 			print, command
 			spawn, command
 
@@ -865,7 +866,7 @@ if recipe EQ 'compute zp' then begin
 			n_gv_ref=n_elements(cat_ref)
 	
 		endif else $
-		if do_standard EQ 'sdss' then begin
+		if do_standard EQ 'SDSS' then begin
 			command='aclient_cgi cocat1.u-strasbg.fr sdss9 -c '+string(im_ra, im_dec_sign, abs(im_dec), FORMAT='(F0.6,A,F0.6)')+' -r 80. -lmg 10.,20. -m 10000000'
 			spawn, command, cat_ref_data
 
@@ -885,8 +886,10 @@ if recipe EQ 'compute zp' then begin
 			cat_ref.magerr[2]=float(strmid(cat_ref_data, 104, 5))
 			cat_ref.magerr[3]=float(strmid(cat_ref_data, 117, 5))
 			cat_ref.magerr[4]=float(strmid(cat_ref_data, 130, 5))
-		endif else $
+		endif else begin
+			print, 'Check if standard stars images belong to the SDSS or Southern star catalog'
 			stop
+		endelse
 
 		flux_radius_median=list()
 		foreach j, input_chip_flux_radius do begin
@@ -898,7 +901,6 @@ if recipe EQ 'compute zp' then begin
 			flux_radius_median.add, sex_radius
 		endforeach
 		flux_radius_median=median(flux_radius_median.toarray(type='FLOAT'))
-
 		
 		for j=0L, input_calib[i].n_chip-1 do begin
 			im_h=headfits(input_calib[i].im_file, ext=j+1)
@@ -928,8 +930,8 @@ if recipe EQ 'compute zp' then begin
 
 		  if n_gv_match GT 2 then begin
 				if do_debug then print, 'Running MATCH'
-        gv_sex_match=gv_sex[(id_match[gv_match] mod n_gv_sex)]
-        gv_ref_match=(id_match[gv_match]/n_gv_sex)
+        	gv_sex_match=gv_sex[(id_match[gv_match] mod n_gv_sex)]
+        	gv_ref_match=(id_match[gv_match]/n_gv_sex)
 
 				case input_calib[i].filter of
 					'u': begin
