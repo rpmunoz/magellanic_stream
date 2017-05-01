@@ -19,9 +19,12 @@ decam_pipeline, 'psfex', program='20130808,20140909', filter='i', tile='4', fwhm
 decam_pipeline, 'report', program='all', filter='z', tile=‘4'
 Solo hay imágenes del 20150906 y 20140909
 
-decam_pipeline, 'setup', program='all', filter='z', tile='4'
+decam_pipeline, 'setup', program='20150906', filter='all', tile='4'
+decam_pipeline, 'setup', program='all', filter='all', tile='4'
 
-decam_pipeline, 'compute zp', program='all', filter='z', tile='4', /ahead
+decam_pipeline, 'compute zp', program='20140909', filter='all', tile='all', /ahead
+decam_pipeline, 'compute zp', program='20141017', filter='all', tile='all', /ahead
+decam_pipeline, 'compute zp', program='20150906', filter='all', tile='all', /ahead
 
 decam_pipeline, 'sextractor', program='all', filter='z', tile='4'
 decam_pipeline, 'scamp', program='all', filter='z', tile='4', /ahead

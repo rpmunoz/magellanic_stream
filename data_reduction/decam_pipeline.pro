@@ -23,6 +23,7 @@ do_align_fwhm = (n_elements(align_fwhm) GT 0) ? align_fwhm : ''
 input_dir='/Volumes/RAID/Magellanic_stream/DECam'
 output_dir='/Volumes/RAID/Magellanic_stream/DECam'
 
+
 do_program_full=strsplit(do_program,',', /extract)
 if do_program EQ 'ALL' then begin
 	temp_program=strsplit(file_search(input_dir+'/*', /TEST_DIRECTORY),'/', /extract)
@@ -304,10 +305,11 @@ for i=0L, n_elements(do_program)-1 do begin
 	if file_test('survey_calib_'+do_program[i]+'.dat') AND recipe NE 'database' then begin
 		readcol, 'survey_calib_'+do_program[i]+'.dat', temp_im_orig_file, temp_object, temp_filter, temp_weight_orig_file, temp_zp, temp_fwhm, temp_mjd, temp_exptime, temp_n_chip, temp_photflag, FORMAT='A,A,A,A,F,F,D,F,I,A', COMMENT='#'
 		n_survey=n_elements(temp_im_orig_file)
-		create_struct, temp_input_calib, '', ['im_orig_file','object','filter','tile','weight_orig_file','mjd','mjd_floor','zp','airmass','im_file','weight_file','fwhm','exptime','n_chip','sex_dir','sex_cat_file','sex_xml_file','sex_check_file','sex_zp_file','sex_zp_full_file','photflag','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file'], 'A,A,A,A,A,D,D,F,F,A,A,F,F,I,A,A,A,A,A,A,A,A,A,A,A,A', dim=n_survey
+		create_struct, temp_input_calib, '', ['im_orig_file','object','program','filter','tile','weight_orig_file','mjd','mjd_floor','zp','airmass','im_file','weight_file','fwhm','exptime','n_chip','sex_dir','sex_cat_file','sex_xml_file','sex_check_file','sex_zp_file','sex_zp_full_file','photflag','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file'], 'A,A,A,A,A,A,D,D,F,F,A,A,F,F,I,A,A,A,A,A,A,A,A,A,A,A,A', dim=n_survey
 		temp_input_calib.im_orig_file=input_calib_dir[i]+'/'+repstr(temp_im_orig_file,'.fits.fz','.fits')
 		temp_input_calib.weight_orig_file=input_calib_dir[i]+'/'+repstr(temp_weight_orig_file,'.fits.fz','.fits')
 		temp_input_calib.object=temp_object
+		temp_input_calib.program=do_program[i]
 		temp_input_calib.filter=temp_filter
 		temp_input_calib.mjd=temp_mjd
 		temp_input_calib.mjd_floor=floor(temp_mjd+0.2)
@@ -600,12 +602,16 @@ if recipe EQ 'setup' then begin
 			command='funpack '+input_calib[i].im_orig_file+'.fz'
 			print, command
 			spawn, command
+
+			fix_header, input_calib[i].im_orig_file
 		endif
 
 		if file_test(input_calib[i].weight_orig_file, /regular) EQ 0 then begin
 			command='funpack '+input_calib[i].weight_orig_file+'.fz'
 			print, command
 			spawn, command
+
+			fix_header, input_calib[i].weight_orig_file
 		endif
 
 		if file_test(input_calib[i].im_file, /regular) EQ 0 then begin
@@ -744,55 +750,68 @@ if recipe EQ 'compute zp' then begin
 			   	  	temp_y=cat_sex[gv_stars].y_image
 			
 			  	    for k=0L, temp_n-1 do begin
-				        x_range=[ floor(temp_x[k]-(vig_diam-1.)/2), ceil(temp_x[k]+(vig_diam-1.)/2) ]
-			    	    y_range=[ floor(temp_y[k]-(vig_diam-1.)/2), ceil(temp_y[k]+(vig_diam-1.)/2) ]
-						vig_data = im_data[x_range[0]:x_range[1],y_range[0]:y_range[1]]; - im_sky
-						vig_size=size(vig_data, /dim)
+			  	    	if floor(temp_x[k]-(vig_diam-1.)/2) GT 0 AND ceil(temp_x[k]+(vig_diam-1.)/2) LT im_size[0] $
+			  	    		AND floor(temp_y[k]-(vig_diam-1.)/2) GT 0 AND ceil(temp_y[k]+(vig_diam-1.)/2) LT im_size[1] then begin
 
-						x_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
-						y_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
-						vig_center_data=vig_data[x_center_range[0]:x_center_range[1],y_center_range[0]:y_center_range[1]]
-						vig_center_size=size(vig_center_data, /dim)
+					        x_range=[ floor(temp_x[k]-(vig_diam-1.)/2), ceil(temp_x[k]+(vig_diam-1.)/2) ]
+				    	    y_range=[ floor(temp_y[k]-(vig_diam-1.)/2), ceil(temp_y[k]+(vig_diam-1.)/2) ]
+							vig_data = im_data[x_range[0]:x_range[1],y_range[0]:y_range[1]]; - im_sky
+							vig_size=size(vig_data, /dim)
 
-						im_max=max(vig_center_data, gv_max)
-						im_c= [gv_max mod vig_center_size[0], gv_max/vig_center_size[0]]
-						im_c += [x_center_range[0], y_center_range[0]]
+							x_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
+							y_center_range=[ floor((vig_diam-1.)/4), ceil(-1-(vig_diam-1.)/4) ]
+							vig_center_data=vig_data[x_center_range[0]:x_center_range[1],y_center_range[0]:y_center_range[1]]
+							vig_center_size=size(vig_center_data, /dim)
 
-						dist_circle, vig_mask, vig_size, im_c[0], im_c[1]
-						vig_sky=median(vig_data[where(vig_mask GT 20., n_sky)])
-						vig_mag=25.-2.5*alog10(total(vig_data[where(vig_mask LE 20., n_star)]) - n_star*vig_sky )
+							im_max=max(vig_center_data, gv_max)
+							im_c= [gv_max mod vig_center_size[0], gv_max/vig_center_size[0]]
+							im_c += [x_center_range[0], y_center_range[0]]
 
-						vig_res=abs( vig_data-vig_sky - max(vig_center_data-vig_sky)/2. )
-						gv=sort(vig_res*vig_mask^2)
-						vig_fwhm=2*median(vig_mask[gv[1:5]])
-						print, 'Radius for computing FWHM ', vig_mask[gv[1:5]]
-						plot, vig_mask, vig_data-vig_sky, xrange=[0,30], psym=1
-						oplot, [0,100], max(vig_data-vig_sky)/2.*[1,1], line=2, color=200
-						oplot, vig_fwhm/2.*[1,1], [-1e5,1e5], line=2, color=200
+							dist_circle, vig_mask, vig_size, im_c[0], im_c[1]
+							vig_sky=median(vig_data[where(vig_mask GT 20., n_sky)])
+							vig_mag=25.-2.5*alog10(total(vig_data[where(vig_mask LE 20., n_star)]) - n_star*vig_sky )
 
-						vig_skyrad=4*vig_fwhm < 40.
-						vig_psfrad=3*vig_fwhm < 50.
-						vig_fitrad=vig_fwhm < 50.
+							vig_res=abs( vig_data-vig_sky - max(vig_center_data-vig_sky)/2. )
+							gv=sort(vig_res*vig_mask^2)
+							vig_fwhm=2*median(vig_mask[gv[1:5]])
+							print, 'Radius for computing FWHM ', vig_mask[gv[1:5]]
+							plot, vig_mask, vig_data-vig_sky, xrange=[0,30], psym=1
+							oplot, [0,100], max(vig_data-vig_sky)/2.*[1,1], line=2, color=200
+							oplot, vig_fwhm/2.*[1,1], [-1e5,1e5], line=2, color=200
 
-						gcntrd, vig_data, im_c[0], im_c[1], im_cx, im_cy, vig_fwhm
-						dist_circle, vig_mask, vig_size, im_cx, im_cy
-						vig_sky=median(vig_data[where(vig_mask GT vig_skyrad, n_sky)])
-						vig_mag=25.-2.5*alog10(total(vig_data[where(vig_mask LE vig_skyrad, n_star)]) - n_star*vig_sky )
-						plot, vig_mask, vig_data-vig_sky, xrange=[0,30], psym=1
-						oplot, [0,100], max(vig_data-vig_sky)/2.*[1,1], line=2, color=200
-						oplot, vig_fwhm/2.*[1,1], [-1e5,1e5], line=2, color=200
+							vig_skyrad=4*vig_fwhm < 40.
+							vig_psfrad=3*vig_fwhm < 50.
+							vig_fitrad=vig_fwhm < 50.
 
-						getpsf, vig_data, im_cx, im_cy, vig_mag, vig_sky, im_ron, im_gain, psf_param, psf_residuals, [0], vig_psfrad, vig_fitrad, input_calib[i].sex_dir+'/im_sextractor_psf.fits' 
-							im_fwhm.add, 2*sqrt(2*alog(2))*sqrt( (psf_param[3]^2 + psf_param[4]^2)/2. )
-						print, 'FWHM ', im_fwhm[-1],' pixels'
+							gcntrd, vig_data, im_c[0], im_c[1], im_cx, im_cy, vig_fwhm
+							dist_circle, vig_mask, vig_size, im_cx, im_cy
+							vig_sky=median(vig_data[where(vig_mask GT vig_skyrad, n_sky)])
+							vig_mag=25.-2.5*alog10(total(vig_data[where(vig_mask LE vig_skyrad, n_star)]) - n_star*vig_sky )
+							plot, vig_mask, vig_data-vig_sky, xrange=[0,30], psym=1
+							oplot, [0,100], max(vig_data-vig_sky)/2.*[1,1], line=2, color=200
+							oplot, vig_fwhm/2.*[1,1], [-1e5,1e5], line=2, color=200
 
-						dist_circle, vig_mask, vig_size, im_cx, im_cy
-						plot, vig_mask, vig_data-vig_sky, xrange=[0,30], psym=1
-						x=findgen(100)/10.
-						y=gaussian(x,[psf_param[0], 0., mean(psf_param[3:4])])
-						oplot, x, y, line=2, color=200
-						oplot, im_fwhm[-1]/2.*[1,1], [-1e5,1e5], line=2, color=200
-								
+							psf_param=[]
+							getpsf, vig_data, im_cx, im_cy, vig_mag, vig_sky, im_ron, im_gain, psf_param, psf_residuals, [0], vig_psfrad, vig_fitrad, input_calib[i].sex_dir+'/im_sextractor_psf.fits' 
+
+							catch, error
+							if error EQ 0 then begin
+
+								im_fwhm.add, 2*sqrt(2*alog(2))*sqrt( (psf_param[3]^2 + psf_param[4]^2)/2. )
+								print, 'FWHM ', im_fwhm[-1],' pixels'
+
+								dist_circle, vig_mask, vig_size, im_cx, im_cy
+								plot, vig_mask, vig_data-vig_sky, xrange=[0,30], psym=1
+								x=findgen(100)/10.
+								y=gaussian(x,[psf_param[0], 0., mean(psf_param[3:4])])
+								oplot, x, y, line=2, color=200
+								oplot, im_fwhm[-1]/2.*[1,1], [-1e5,1e5], line=2, color=200
+							endif else begin
+								catch, /cancel
+								print, 'Procedure GETPSF failed'
+							endelse
+
+						endif
 					endfor
 				endif	
 	
@@ -927,11 +946,12 @@ if recipe EQ 'compute zp' then begin
 			if do_debug then wait, 2
 
 		 	gv_match= where( min( (cat_sex[gv_sex].alpha_j2000#make_array(n_gv_ref,value=1,/double)-make_array(n_gv_sex,value=1.,/double)#cat_ref[*].ra)^2 + (cat_sex[gv_sex].delta_j2000#make_array(n_gv_ref,value=1,/double)-make_array(n_gv_sex,value=1.,/double)#cat_ref[*].dec)^2, id_match, DIM=1) LT (0.6/3600.)^2, n_gv_match)
+		 	print, 'Number of matched stars ', n_gv_match
 
-		  if n_gv_match GT 2 then begin
-				if do_debug then print, 'Running MATCH'
-        	gv_sex_match=gv_sex[(id_match[gv_match] mod n_gv_sex)]
-        	gv_ref_match=(id_match[gv_match]/n_gv_sex)
+			if n_gv_match GT 2 then begin
+				print, 'Using matched stars for computing the zp'
+				gv_sex_match=gv_sex[(id_match[gv_match] mod n_gv_sex)]
+				gv_ref_match=(id_match[gv_match]/n_gv_sex)
 
 				case input_calib[i].filter of
 					'u': begin
