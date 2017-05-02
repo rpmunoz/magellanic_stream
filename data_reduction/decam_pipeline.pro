@@ -1,4 +1,4 @@
-pro decam_pipeline, recipe, PROGRAM=program, FILTER=filter, OVERWRITE=overwrite, TILE=tile, DEBUG=debug, STANDARD=standard, AHEAD=ahead, FWHM=fwhm, DITHER=dither, DITHER_EXCLUDE=dither_exclude, ALIGN_FWHM=align_fwhm
+pro decam_pipeline, recipe, PROGRAM=program, FILTER=filter, OVERWRITE=overwrite, TILE=tile, DEBUG=debug, STANDARD=standard, AHEAD=ahead, FWHM=fwhm, DITHER=dither, DITHER_EXCLUDE=dither_exclude, ALIGN_FWHM=align_fwhm, ZP_PHOT=zp_phot
 
 do_program= (n_elements(program) GT 0) ? strupcase(program) : '20130808'
 do_tile= (n_elements(tile) GT 0) ? tile : '1'
@@ -10,8 +10,9 @@ do_n_chip= (do_program EQ '20130808') ? '61' : '60'
 do_scamp_ast='Y'
 do_scamp_phot='Y'
 do_overwrite= (n_elements(overwrite) GT 0) ? keyword_set(overwrite) : 0
-do_ahead= (n_elements(ahead) GT 0) ? keyword_set(ahead) : 0
-do_debug= (n_elements(debug) GT 0) ? keyword_set(debug) : 0
+do_ahead = (n_elements(ahead) GT 0) ? keyword_set(ahead) : 0
+do_zp_phot = (n_elements(zp_phot) GT 0) ? keyword_set(zp_phot) : 0
+do_debug = (n_elements(debug) GT 0) ? keyword_set(debug) : 0
 do_tile_orig=do_tile
 do_filter_orig=do_filter
 do_program_orig=do_program
@@ -305,12 +306,13 @@ for i=0L, n_elements(do_program)-1 do begin
 	if file_test('survey_calib_'+do_program[i]+'.dat') AND recipe NE 'database' then begin
 		readcol, 'survey_calib_'+do_program[i]+'.dat', temp_im_orig_file, temp_object, temp_filter, temp_weight_orig_file, temp_zp, temp_fwhm, temp_mjd, temp_exptime, temp_n_chip, temp_photflag, FORMAT='A,A,A,A,F,F,D,F,I,A', COMMENT='#'
 		n_survey=n_elements(temp_im_orig_file)
-		create_struct, temp_input_calib, '', ['im_orig_file','object','program','filter','tile','weight_orig_file','mjd','mjd_floor','zp','airmass','im_file','weight_file','fwhm','exptime','n_chip','sex_dir','sex_cat_file','sex_xml_file','sex_check_file','sex_zp_file','sex_zp_full_file','photflag','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file'], 'A,A,A,A,A,A,D,D,F,F,A,A,F,F,I,A,A,A,A,A,A,A,A,A,A,A,A', dim=n_survey
+		create_struct, temp_input_calib, '', ['im_orig_file','object','program','filter','tile','weight_orig_file','skip','mjd','mjd_floor','zp','airmass','im_file','weight_file','fwhm','exptime','n_chip','sex_dir','sex_cat_file','sex_xml_file','sex_check_file','sex_zp_file','sex_zp_full_file','photflag','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file'], 'A,A,A,A,A,A,A,D,D,F,F,A,A,F,F,I,A,A,A,A,A,A,A,A,A,A,A,A', dim=n_survey
 		temp_input_calib.im_orig_file=input_calib_dir[i]+'/'+repstr(temp_im_orig_file,'.fits.fz','.fits')
 		temp_input_calib.weight_orig_file=input_calib_dir[i]+'/'+repstr(temp_weight_orig_file,'.fits.fz','.fits')
 		temp_input_calib.object=temp_object
 		temp_input_calib.program=do_program[i]
 		temp_input_calib.filter=temp_filter
+		temp_input_calib.skip='F'
 		temp_input_calib.mjd=temp_mjd
 		temp_input_calib.mjd_floor=floor(temp_mjd+0.2)
 		temp_input_calib.zp=temp_zp
@@ -648,6 +650,7 @@ if recipe EQ 'compute zp' then begin
 		im_airmass=tai2airmass(im_ra,im_dec,2000., mjd=im_mjd, lon=-70.8065, latitude=-30.1692, alt=2243.31)
 		input_calib[i].airmass=im_airmass
 
+		print, 'Iteration ', i
 		print, input_calib[i].im_file, date_conv(im_mjd+2400000.5D,'S'), im_zp, im_exptime, im_airmass, im_filter, FORMAT='("Image filename ",A,2X,A,2X,F0.2,2X,F0.2,2X,F0.2,2X,A)'
 
 		case input_calib[i].filter of
@@ -656,31 +659,46 @@ if recipe EQ 'compute zp' then begin
 				sex_mag_range=[7,15.]
 				sex_flux_radius_min=2
 				plot_mag_range=[18,5]
-				plot_flux_radius_range=[2,8]
+				plot_flux_radius_range=[2,12]
 				end
 			'g': begin
 				sex_satur_level='30000.'
 				sex_mag_range=[11,19.]
 				sex_flux_radius_min=2
 				plot_mag_range=[20,8]
-				plot_flux_radius_range=[2,8]
+				plot_flux_radius_range=[2,12]
+				end
+			'r': begin
+				sex_satur_level='30000.'
+				sex_mag_range=[12,18.]
+				sex_flux_radius_min=2
+				plot_mag_range=[20,8]
+				plot_flux_radius_range=[2,12]
 				end
 			'i': begin
 				sex_satur_level='30000.'
 				sex_mag_range=[12,18.]
 				sex_flux_radius_min=2
 				plot_mag_range=[20,8]
-				plot_flux_radius_range=[2,8]
+				plot_flux_radius_range=[2,12]
 				end
 			'z': begin
 				sex_satur_level='30000.'
 				sex_mag_range=[12,20.]
 				sex_flux_radius_min=2
 				plot_mag_range=[20,8]
-				plot_flux_radius_range=[2,8]
+				plot_flux_radius_range=[2,12]
+				end
+			'Y': begin
+				input_calib[i].skip = 'T'
 				end
 			else: stop
 		endcase
+
+		if input_calib[i].skip EQ 'T' then begin
+			print, 'Y-band filter images are not supported'
+			continue
+		endif
 
 		im_h=headfits(input_calib[i].im_file)
 		im_ra=ten(fxpar(im_h, 'RA'))*360./24.
@@ -699,7 +717,11 @@ if recipe EQ 'compute zp' then begin
 		if file_sex_cat.exists AND file_sex_cat.size GT 0 then fits_info, input_calib[i].sex_cat_file, n_ext=sex_n_ext, /silent $
 		else sex_n_ext=0
 
-		if sex_n_ext EQ input_calib[i].n_chip*2 AND file_sex_zp.exists AND file_sex_zp.size GT 100 AND file_sex_zp_full.exists AND file_sex_zp_full.size GT 100 then continue
+		if sex_n_ext EQ input_calib[i].n_chip*2 AND file_sex_zp.exists AND file_sex_zp.size GT 100 AND file_sex_zp_full.exists AND file_sex_zp_full.size GT 100 then begin
+			print, 'file_sex_zp EXISTS: ', input_calib[i].sex_zp_file
+			print, 'file_sex_zp_full EXISTS: ', input_calib[i].sex_zp_full_file
+			continue
+		endif
 
 		im_fwhm=list()
 		openw, lun_zp, input_calib[i].sex_zp_file, /get_lun
@@ -808,7 +830,9 @@ if recipe EQ 'compute zp' then begin
 								oplot, im_fwhm[-1]/2.*[1,1], [-1e5,1e5], line=2, color=200
 							endif else begin
 								catch, /cancel
+								print, 'Erro code ', error
 								print, 'Procedure GETPSF failed'
+								stop
 							endelse
 
 						endif
@@ -980,6 +1004,19 @@ if recipe EQ 'compute zp' then begin
 							printf, lun_zp_full, j+1, cat_sex[gv_sex_match[gv[k]]].number, cat_sex[gv_sex_match[gv[k]]].alpha_j2000, cat_sex[gv_sex_match[gv[k]]].delta_j2000, cat_sex[gv_sex_match[gv[k]]].flux_aper[4], cat_sex[gv_sex_match[gv[k]]].flux_auto, cat_ref[gv_ref_match[gv[k]]].mag[1], mag_diff[k], pipe_airmass, FORMAT='(I4,4X,I4,4X,F0.6,4X,F0.6,4X,F15.3,4X,F15.3,4X,F0.3,4X,F0.3,4X,F0.3)'
 						endfor
 						end
+					'r': begin
+						gv=where(cat_ref[gv_ref_match].mag[2] GT 0 and cat_sex[gv_sex_match].flux_aper[4] GT 0., n_gv)
+
+						mag_diff=cat_ref[gv_ref_match[gv]].mag[2] + 2.5*alog10( cat_sex[gv_sex_match[gv]].flux_aper[4]/im_exptime)
+						pipe_zp=biweight_mean(mag_diff, pipe_zperr)
+						plot, cat_ref[gv_ref_match].mag[2], mag_diff, psym=1, xrange=sex_mag_range+[0,2], yrange=median(mag_diff)+[-1.,1.]
+						oplot, [0,100], pipe_zp*[1,1], color=200, line=2
+						print, 'Pipeline zero point ', string(pipe_zp, pipe_zperr, FORMAT='(F0.2,4X,F0.2)')
+
+						for k=0L, n_gv-1 do begin
+							printf, lun_zp_full, j+1, cat_sex[gv_sex_match[gv[k]]].number, cat_sex[gv_sex_match[gv[k]]].alpha_j2000, cat_sex[gv_sex_match[gv[k]]].delta_j2000, cat_sex[gv_sex_match[gv[k]]].flux_aper[4], cat_sex[gv_sex_match[gv[k]]].flux_auto, cat_ref[gv_ref_match[gv[k]]].mag[2], mag_diff[k], pipe_airmass, FORMAT='(I4,4X,I4,4X,F0.6,4X,F0.6,4X,F15.3,4X,F15.3,4X,F0.3,4X,F0.3,4X,F0.3)'
+						endfor
+						end
 					'i': begin
 						gv=where(cat_ref[gv_ref_match].mag[3] GT 0 and cat_sex[gv_sex_match].flux_aper[4] GT 0., n_gv)
 
@@ -1010,7 +1047,7 @@ if recipe EQ 'compute zp' then begin
 				endcase
 
 				printf, lun_zp, j+1, im_zp-2.5*alog10(im_exptime), pipe_airmass, pipe_zp, pipe_zperr, n_gv, im_fwhm, FORMAT='(I4,4X,F0.3,4X,F0.3,4X,F0.3,4X,F0.3,4X,I4,4X,F0.2)'
-      endif
+      		endif
      
 		endfor
 		print, 'DECam zero point ', im_zp
@@ -1019,30 +1056,36 @@ if recipe EQ 'compute zp' then begin
 		
 	endfor
 
-	gv_phot=where(input_calib.airmass LT 2. AND input_calib.mjd GT 0. AND input_calib.photflag EQ 'T', n_gv_phot)
+	if do_zp_phot then gv_phot=where(input_calib.airmass LT 2. AND input_calib.mjd GT 0. AND input_calib.skip EQ 'F' AND input_calib.photflag EQ 'T', n_gv_phot) $
+	else gv_phot=where(input_calib.airmass LT 2. AND input_calib.mjd GT 0. AND input_calib.skip EQ 'F', n_gv_phot)
+
 	for i=0L, n_gv_phot-1 do begin
 		print, 'Processing file ', input_calib[gv_phot[i]].sex_zp_file
 
-		readcol, input_calib[gv_phot[i]].sex_zp_file, temp_ext, temp_decam_zp, temp_airmass, temp_zp, temp_zperr, temp_zp_nstars, temp_fwhm, FORMAT='I,F,F,F,F,I,F'
-		create_struct, temp_struct, '', ['ext','zp','airmass','filter','mjd','photflag'], 'I,F,F,A,F,A', dim=n_elements(temp_ext)
-		temp_struct.ext=temp_ext
-		temp_struct.zp=temp_zp
-		temp_struct.airmass=temp_airmass
-		temp_struct.filter=input_calib[gv_phot[i]].filter
-		temp_struct.mjd=input_calib[gv_phot[i]].mjd
-		temp_struct.photflag=input_calib[gv_phot[i]].photflag
-		if i EQ 0L then pipe_zp=temp_struct $
-		else pipe_zp=[pipe_zp,temp_struct]
+		readcol, input_calib[gv_phot[i]].sex_zp_file, temp_ext, temp_decam_zp, temp_airmass, temp_zp, temp_zperr, temp_zp_nstars, temp_fwhm, FORMAT='I,F,F,F,F,I,F', COUNT=n_lines
+		if n_lines GT 0 then begin
+			create_struct, temp_struct, '', ['ext','zp','airmass','filter','mjd','photflag'], 'I,F,F,A,F,A', dim=n_elements(temp_ext)
+			temp_struct.ext=temp_ext
+			temp_struct.zp=temp_zp
+			temp_struct.airmass=temp_airmass
+			temp_struct.filter=input_calib[gv_phot[i]].filter
+			temp_struct.mjd=input_calib[gv_phot[i]].mjd
+			temp_struct.photflag=input_calib[gv_phot[i]].photflag
+			if size(pipe_zp, /N_ELEMENTS) EQ 0L then pipe_zp=temp_struct $
+			else pipe_zp=[pipe_zp,temp_struct]
+		endif
 
-		readcol, input_calib[gv_phot[i]].sex_zp_full_file, temp_ext, temp_id, temp_ra, temp_dec, temp_flux_aper, temp_flux_auto, temp_mag_ref, temp_zp, temp_airmass, FORMAT='I,I,F,F,D,D,F,F,F'
-		create_struct, temp_struct, '', ['ext','zp','airmass','filter','mjd'], 'I,F,F,A,F', dim=n_elements(temp_ext)
-		temp_struct.ext=temp_ext
-		temp_struct.zp=temp_zp
-		temp_struct.airmass=temp_airmass
-		temp_struct.filter=input_calib[gv_phot[i]].filter
-		temp_struct.mjd=input_calib[gv_phot[i]].mjd
-		if i EQ 0L then pipe_zp_full=temp_struct $
-		else pipe_zp_full=[pipe_zp_full,temp_struct]
+		if n_lines GT 0 then begin
+			readcol, input_calib[gv_phot[i]].sex_zp_full_file, temp_ext, temp_id, temp_ra, temp_dec, temp_flux_aper, temp_flux_auto, temp_mag_ref, temp_zp, temp_airmass, FORMAT='I,I,F,F,D,D,F,F,F', COUNT=n_lines
+			create_struct, temp_struct, '', ['ext','zp','airmass','filter','mjd'], 'I,F,F,A,F', dim=n_elements(temp_ext)
+			temp_struct.ext=temp_ext
+			temp_struct.zp=temp_zp
+			temp_struct.airmass=temp_airmass
+			temp_struct.filter=input_calib[gv_phot[i]].filter
+			temp_struct.mjd=input_calib[gv_phot[i]].mjd
+			if size(pipe_zp_full, /N_ELEMENTS) EQ 0L then pipe_zp_full=temp_struct $
+			else pipe_zp_full=[pipe_zp_full,temp_struct]
+		endif
 
 	endfor
 
@@ -1051,40 +1094,50 @@ if recipe EQ 'compute zp' then begin
 
 	openw, lun, 'survey_zp_'+do_program+'.dat', /get_lun
 	printf, lun, '# MJD		filter		zp		k		zp_err		k_err		PHOTFLAG'
+
 	for i=0L, n_elements(filter_uniq)-1 do begin
 		for j=0L, n_elements(mjd_uniq)-1 do begin
 
 			gv_pipe=where(pipe_zp.filter EQ filter_uniq[i] AND floor(pipe_zp.mjd+2./24) EQ mjd_uniq[j], n_gv_pipe)
-			gv_pipe_phot=where(pipe_zp.filter EQ filter_uniq[i] AND floor(pipe_zp.mjd+2./24) EQ mjd_uniq[j] AND pipe_zp.photflag EQ 'T', n_gv_pipe_phot)
-			coeff=robust_linefit(pipe_zp[gv_pipe_phot].airmass, pipe_zp[gv_pipe_phot].zp, temp_yfit, temp_sigma, coeff_error)
-			photflag = coeff_error[0] LT 0.015 ? 'T' : 'F'
-			printf, lun, mjd_uniq[j], filter_uniq[i], coeff[0], coeff[1], coeff_error[0], coeff_error[1], photflag, FORMAT='(F0.1,4X,A,4X,F0.2,4X,F0.2,4X,F0.2,4X,F0.2,4X,A)'
-
+			if do_zp_phot then begin
+				gv_pipe_phot=where(pipe_zp.filter EQ filter_uniq[i] AND floor(pipe_zp.mjd+2./24) EQ mjd_uniq[j] AND pipe_zp.photflag EQ 'T', n_gv_pipe_phot)
+				coeff=robust_linefit(pipe_zp[gv_pipe_phot].airmass, pipe_zp[gv_pipe_phot].zp, temp_yfit, temp_sigma, coeff_error)
+				photflag = coeff_error[0] LT 0.015 ? 'T' : 'F'
+				printf, lun, mjd_uniq[j], filter_uniq[i], coeff[0], coeff[1], coeff_error[0], coeff_error[1], photflag, FORMAT='(F0.1,4X,A,4X,F0.2,4X,F0.2,4X,F0.2,4X,F0.2,4X,A)'
+			endif $
+			else begin
+				gv_pipe_phot=where(pipe_zp.filter EQ filter_uniq[i] AND floor(pipe_zp.mjd+2./24) EQ mjd_uniq[j], n_gv_pipe_phot)
+				coeff=robust_linefit(pipe_zp[gv_pipe_phot].airmass, pipe_zp[gv_pipe_phot].zp, temp_yfit, temp_sigma, coeff_error)
+				photflag = coeff_error[0] LT 0.05 ? 'T' : 'F'
+				printf, lun, mjd_uniq[j], filter_uniq[i], coeff[0], coeff[1], coeff_error[0], coeff_error[1], photflag, FORMAT='(F0.1,4X,A,4X,F0.2,4X,F0.2,4X,F0.2,4X,F0.2,4X,A)'
+			endelse
+			
 			cgloadct, 0
 			cgwindow, wxsize=800, wysize=600
 			cgplot, [0], [0], xrange=[1.,1.9], yrange=mean(pipe_zp[gv_pipe].zp)+[-1,1], /nodata, /window, xtitle='airmass', ytitle='mag_std - mag_inst', title='Filter '+filter_uniq[i]+' - Date '+date_conv(mjd_uniq[j]+2400000.5D,'S')
 			cgplot, pipe_zp[gv_pipe].airmass, pipe_zp[gv_pipe].zp, psym=cgsymcat('filled circle'), symsize=0.4, color='blue', /over, /addcmd
-			cgplot, pipe_zp[gv_pipe_phot].airmass, pipe_zp[gv_pipe_phot].zp, psym=cgsymcat('filled circle'), symsize=0.4, color='red', /over, /addcmd
+			if do_zp_phot then cgplot, pipe_zp[gv_pipe_phot].airmass, pipe_zp[gv_pipe_phot].zp, psym=cgsymcat('filled circle'), symsize=0.4, color='red', /over, /addcmd
 			cgplot, [0.,100.], coeff[0]+coeff[1]*[0.,100.], color='black', line=2, /over, /addcmd
 			cglegend, color='red', align=0, location=[0.14,0.86], length=0.02, titles=filter_uniq[i]+'-band coeff='+string(coeff,format='(F0.3,",",F0.3)')+' coeff_error='+string(coeff_error,format='(F0.3,",",F0.3)'), vspace=2., /addcmd
-			cgcontrol, output=calib_dir+'/standard_zp_airmass_uncorrected_'+filter_uniq[i]+'_'+string(mjd_uniq[j],FORMAT='(I0)')+'.pdf'
+			cgcontrol, output='results/standard_zp_airmass_uncorrected_'+filter_uniq[i]+'_'+string(mjd_uniq[j],FORMAT='(I0)')+'.pdf'
 
 			print, 'Airmass term compute - Filter ', filter_uniq[i], ' Date ', date_conv(mjd_uniq[j]+2400000.5D,'S')
 			print, coeff[0], coeff_error[0], coeff[1], coeff_error[1], FORMAT='("zp = ",F0.3," +- ",F0.3," / k = ", F0.3, " +- ", F0.3)'
 
 			gv_pipe=where(input_calib.filter EQ filter_uniq[i] AND floor(input_calib.mjd+2./24) EQ mjd_uniq[j], n_gv_pipe)
-			gv_pipe_phot=where(input_calib.filter EQ filter_uniq[i] AND floor(input_calib.mjd+2./24) EQ mjd_uniq[j] AND input_calib.photflag EQ 'T', n_gv_pipe_phot)
+			if do_zp_phot then gv_pipe_phot=where(input_calib.filter EQ filter_uniq[i] AND floor(input_calib.mjd+2./24) EQ mjd_uniq[j] AND input_calib.photflag EQ 'T', n_gv_pipe_phot)
 			cgloadct, 0
 			cgwindow, wxsize=800, wysize=600
-			cgplot, [0], [0], xrange=mjd_uniq[j]+[-2,12]/24., yrange=[1.,1.8], /nodata, /window, xtitle='MJD', ytitle='airmass', title='Filter '+filter_uniq[i]+' - Date '+date_conv(mjd_uniq[j]+2400000.5D,'S'), XTICKFORMAT='(F0.1)'
+			cgplot, [0], [0], xrange=mjd_uniq[j]+[-2,12]/24., yrange=[1.,2.0], /nodata, /window, xtitle='MJD', ytitle='airmass', title='Filter '+filter_uniq[i]+' - Date '+date_conv(mjd_uniq[j]+2400000.5D,'S'), XTICKFORMAT='(F0.1)', XCHARSIZE=1
 			cgplot, input_calib[gv_pipe].mjd, input_calib[gv_pipe].airmass, psym=cgsymcat('filled circle'), symsize=1., color='blue', /over, /addcmd
-			cgplot, input_calib[gv_pipe_phot].mjd, input_calib[gv_pipe_phot].airmass, psym=cgsymcat('filled circle'), symsize=1., color='red', /over, /addcmd
-			cgcontrol, output=calib_dir+'/standard_airmass_mjd_'+filter_uniq[i]+'_'+string(mjd_uniq[j],FORMAT='(I0)')+'.pdf'
+			if do_zp_phot then cgplot, input_calib[gv_pipe_phot].mjd, input_calib[gv_pipe_phot].airmass, psym=cgsymcat('filled circle'), symsize=1., color='red', /over, /addcmd
+			cgcontrol, output='results/standard_airmass_mjd_'+filter_uniq[i]+'_'+string(mjd_uniq[j],FORMAT='(I0)')+'.pdf'
 
 			cgdelete, /all
 
 		endfor
 	endfor
+
 	free_lun, lun
 
 	cgdelete, /all
