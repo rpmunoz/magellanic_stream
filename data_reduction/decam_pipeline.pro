@@ -1059,6 +1059,7 @@ if recipe EQ 'compute zp' then begin
 	if do_zp_phot then gv_phot=where(input_calib.airmass LT 2. AND input_calib.mjd GT 0. AND input_calib.skip EQ 'F' AND input_calib.photflag EQ 'T', n_gv_phot) $
 	else gv_phot=where(input_calib.airmass LT 2. AND input_calib.mjd GT 0. AND input_calib.skip EQ 'F', n_gv_phot)
 
+	delvarx, pipe_zp, coeff
 	for i=0L, n_gv_phot-1 do begin
 		print, 'Processing file ', input_calib[gv_phot[i]].sex_zp_file
 
