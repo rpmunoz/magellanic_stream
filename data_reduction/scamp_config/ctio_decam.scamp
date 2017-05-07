@@ -52,8 +52,8 @@ CROSSID_RADIUS         8.0             # Cross-id initial radius (arcsec)
 #---------------------------- Astrometric solution ----------------------------
  
 SOLVE_ASTROM           Y               # Compute astrometric solution (Y/N) ?
-#ASTRINSTRU_KEY         FILTER         # FITS keyword(s) defining the astrom
-ASTRINSTRU_KEY         PROGRAM         # FITS keyword(s) defining the astrom
+ASTRINSTRU_KEY         FILTER         # FITS keyword(s) defining the astrom
+#ASTRINSTRU_KEY         PROGRAM         # FITS keyword(s) defining the astrom
 STABILITY_TYPE         INSTRUMENT      # EXPOSURE, GROUP, INSTRUMENT or FILE
 CENTROID_KEYS          XWIN_IMAGE,YWIN_IMAGE # Cat. parameters for centroiding
 CENTROIDERR_KEYS       ERRAWIN_IMAGE,ERRBWIN_IMAGE,ERRTHETAWIN_IMAGE

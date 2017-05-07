@@ -1484,10 +1484,10 @@ endif else $
 if recipe EQ 'scamp' then begin
 
 
-  scamp_pos_error='1.2'
-  scamp_scale_error='1.02'
-  scamp_angle_error='0.02'
-  scamp_sn_thresholds='30.,60.0'
+	scamp_pos_error='1.2'
+	scamp_scale_error='1.02'
+	scamp_angle_error='0.02'
+	scamp_sn_thresholds='30.,60.0'
 	scamp_fwhm_thresholds='0.,100.'
 	scamp_crossid_radius='4.'
 	scamp_distort_degrees='4'
@@ -1496,14 +1496,14 @@ if recipe EQ 'scamp' then begin
 	scamp_astrefmag_limits='6.,20.' ;'-99.,18.' 
 	scamp_match_resol='0.'
 
-  scamp_refcat_dir = output_scamp_dir[0]+'/refcat'
+	scamp_refcat_dir = output_scamp_dir[0]+'/refcat'
 	scamp_dir_out=output_scamp_dir[0]+'/PROGRAM_'+do_program_plain+'_TILE_'+do_tile_plain+'_FILTER_'+do_filter_plain+'_ORDER_'+scamp_distort_degrees+'_REFCAT_'+scamp_astref_catalog
 	scamp_list_file=scamp_dir_out+'/scamp_decam_'+do_program_plain+'_'+do_filter_plain+'.dat'
 	scamp_cat_file_out = scamp_dir_out+'/scamp_decam_'+do_program_plain+'_'+do_filter_plain+'.ldac'
-  scamp_cat_type_out = 'FITS_LDAC'
-  scamp_xml_file = scamp_dir_out+'/scamp_decam_'+do_program_plain+'_'+do_filter_plain+'.xml'
-  scamp_check_type = 'SKY_ALL,FGROUPS,DISTORTION,ASTR_INTERROR2D,ASTR_INTERROR1D,ASTR_REFERROR2D,ASTR_REFERROR1D,ASTR_CHI2,PHOT_ERROR'
-  scamp_check_file = strjoin(scamp_dir_out+'/'+['sky_all','fgroups','distort','astr_interror2d','astr_interror1d','astr_referror2d','astr_referror1d','astr_chi2','psphot_error'],',')
+	scamp_cat_type_out = 'FITS_LDAC'
+	scamp_xml_file = scamp_dir_out+'/scamp_decam_'+do_program_plain+'_'+do_filter_plain+'.xml'
+	scamp_check_type = 'SKY_ALL,FGROUPS,DISTORTION,ASTR_INTERROR2D,ASTR_INTERROR1D,ASTR_REFERROR2D,ASTR_REFERROR1D,ASTR_CHI2,PHOT_ERROR'
+	scamp_check_file = strjoin(scamp_dir_out+'/'+['sky_all','fgroups','distort','astr_interror2d','astr_interror1d','astr_referror2d','astr_referror1d','astr_chi2','psphot_error'],',')
 
 	scamp_mag_bin=0.5
 	scamp_radius_bin=0.2
@@ -1539,9 +1539,9 @@ if recipe EQ 'scamp' then begin
 				scamp_distort_degrees='4'
 			end
 			'z': begin
-				scamp_mag_range=[15.,21.]
+				scamp_mag_range=[15.,22.]
 				plot_mag_range=[25,15]
-  			scamp_sn_thresholds='20.,40.0'
+  				scamp_sn_thresholds='20.,40.0'
 				scamp_distort_degrees='4'
 			end
 			else: stop
@@ -1685,28 +1685,32 @@ if recipe EQ 'swarp' then begin
 			if do_dither then input_dither_full=string(input_target[gv].dither) $
 			else input_dither_full='ALL'
 
-     	if do_align_fwhm NE '' then begin
+	     	if do_align_fwhm NE '' then begin
 		
 				swarp_alignref_h=list()	
 				for k=0L, n_elements(input_align_fwhm_full)-1 do begin
 
-				  swarp_list_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.lst'
+					swarp_list_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.lst'
 					swarp_im_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.fits'
 					swarp_weight_out=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.WEIGHT.fits'
 					swarp_xml_file=output_stack_swarp_dir+'/swarp_header_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_align_fwhm_full[k],FORMAT='(F0.1)'),'-')+'.xml'
 
 					gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GE (input_align_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LT (input_align_fwhm_full[k])[1]/0.2637, n_gv)
 
-      	  if n_gv GT 0 AND ( file_test(swarp_im_out) EQ 0 OR do_overwrite ) then begin
+			      	if n_gv GT 0 AND ( file_test(swarp_im_out) EQ 0 OR do_overwrite ) then begin
 
-        	  for l=0L, n_gv-1 do begin
-          	  file_copy, input_target[gv[l]].scamp_head_file, input_target[gv[l]].swarp_head_file, /OVERWRITE
-          	endfor
+			        	for l=0L, n_gv-1 do begin
+			          		file_copy, input_target[gv[l]].scamp_head_file, input_target[gv[l]].swarp_head_file, /OVERWRITE
+			          	endfor
 
-         		forprint, input_target[gv].swarp_im_file, textout=swarp_list_file, FORMAT='(A)', /NOCOMMENT
+			          	print, 'Processing the following image files'
+			          	print, input_target[gv].swarp_im_file
+			          	print
+
+         				forprint, input_target[gv].swarp_im_file, textout=swarp_list_file, FORMAT='(A)', /NOCOMMENT
 						command='swarp @'+swarp_list_file+' -c swarp_config/ctio_decam.swarp'+' -IMAGEOUT_NAME "'+swarp_im_out+'" -WEIGHTOUT_NAME "'+swarp_weight_out+'" -COMBINE_TYPE '+swarp_combine_type+' -RESAMPLE '+swarp_resample_do+' -RESAMPLE_DIR '+swarp_resample_dir+' -SATLEV_DEFAULT 35000 -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_SUFFIX '+swarp_weight_suffix+' -WEIGHT_THRESH 0. -RESCALE_WEIGHTS N -BLANK_BADPIXELS Y -WRITE_XML Y -XML_NAME '+swarp_xml_file+' -VERBOSE_TYPE ' +swarp_verbose+' -RESAMPLING_TYPE '+swarp_resampling_type+' -SUBTRACT_BACK Y -BACK_SIZE 384 -HEADER_ONLY Y'
-          	print, command
-          	spawn, command
+			          	print, command
+			          	spawn, command
 
           	swarp_alignref_h.add, headfits(swarp_im_out)
        		endif else $
@@ -1763,8 +1767,11 @@ if recipe EQ 'swarp' then begin
 							file_copy, input_target[gv[m]].scamp_head_file, input_target[gv[m]].swarp_head_file, /OVERWRITE
 						endfor
 	
-						forprint, input_target[gv].swarp_im_file, textout=swarp_list_file, FORMAT='(A)', /NOCOMMENT
+						print, 'Processing the following image files'
+			          	print, input_target[gv].swarp_im_file
+			          	print
 		
+						forprint, input_target[gv].swarp_im_file, textout=swarp_list_file, FORMAT='(A)', /NOCOMMENT
 						if file_test(swarp_im_out) EQ 0 OR do_overwrite then begin
 							command='swarp @'+swarp_list_file+' -c swarp_config/ctio_decam.swarp'+' -IMAGEOUT_NAME "'+swarp_im_out+'" -WEIGHTOUT_NAME "'+swarp_weight_out+'" -COMBINE_TYPE '+swarp_combine_type+' -RESAMPLE '+swarp_resample_do+' -RESAMPLE_DIR '+swarp_resample_dir+' -SATLEV_DEFAULT 35000 -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_SUFFIX '+swarp_weight_suffix+' -WEIGHT_THRESH 0. -RESCALE_WEIGHTS N -BLANK_BADPIXELS Y -WRITE_XML Y -XML_NAME '+swarp_xml_file+' -VERBOSE_TYPE ' +swarp_verbose+' -RESAMPLING_TYPE '+swarp_resampling_type+' -SUBTRACT_BACK Y -BACK_SIZE 384'
 							print, command
