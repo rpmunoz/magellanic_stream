@@ -1712,16 +1712,16 @@ if recipe EQ 'swarp' then begin
 			          	print, command
 			          	spawn, command
 
-          	swarp_alignref_h.add, headfits(swarp_im_out)
-       		endif else $
-      	  if n_gv GT 0 then begin
-      	    print, 'SWARP - Reading header from align filter image'
-        	  swarp_alignref_h.add, headfits(swarp_im_out)
-        	endif else $
-         		print, 'SWARP - There are no images to create align filter image'
+		          	swarp_alignref_h.add, headfits(swarp_im_out)
+		       		endif else $
+		      		if n_gv GT 0 then begin
+		      	    	print, 'SWARP - Reading header from align filter image'
+		        	 	swarp_alignref_h.add, headfits(swarp_im_out)
+		        	endif else $
+		         		print, 'SWARP - There are no images to create align filter image'
 
 				endfor
-      endif
+ 			endif
 
 			for k=0L, n_elements(input_fwhm_full)-1 do begin
 				print
@@ -1869,130 +1869,145 @@ if recipe EQ 'psfex' then begin
 				print, 'PSFEX - Filtering FWHM of ', input_fwhm_full[k]
 
 				for l=0L, n_elements(input_dither_full)-1 do begin
-				print
-				print, 'PSFEX - Filtering dither number of ', input_dither_full[l]
+					print
+					print, 'PSFEX - Filtering dither number of ', input_dither_full[l]
 
-				case filter_uniq[j] of
-					'u': begin
-						sex_mag_range=[10.,18.]
-						plot_mag_range=[21,10]
-						psfex_mag_range=[15.,18.]+2.5*alog10(600.)
-						plot_mag_range=[21,10]
-					end
-					'g': begin
-						sex_mag_range=[15.,21.]
-						plot_mag_range=[25,15]
-						psfex_mag_range=[16.7,19.5]
-						plot_mag_range=[25,15]
-					end
-					'i': begin
-						sex_mag_range=[15.,21.]
-						plot_mag_range=[25,15]
-						psfex_mag_range=[15.,20.]
-						plot_mag_range=[25,15]
-					end
-					'z': begin
-						sex_mag_range=[15.,21.]
-						plot_mag_range=[25,15]
-						psfex_mag_range=[15.,20.]
-					end
-					else: stop
-				endcase
+					case filter_uniq[j] of
+						'u': begin
+							sex_mag_range=[10.,18.]
+							plot_mag_range=[21,10]
+							psfex_mag_range=[15.,18.]+2.5*alog10(600.)
+							plot_mag_range=[21,10]
+						end
+						'g': begin
+							sex_mag_range=[15.,21.]
+							plot_mag_range=[25,15]
+							psfex_mag_range=[16.7,19.5]
+							plot_mag_range=[25,15]
+						end
+						'i': begin
+							sex_mag_range=[15.,21.]
+							plot_mag_range=[25,15]
+							psfex_mag_range=[15.,20.]
+							plot_mag_range=[25,15]
+						end
+						'z': begin
+							sex_mag_range=[15.,21.]
+							plot_mag_range=[25,15]
+							psfex_mag_range=[15.,20.]
+						end
+						else: stop
+					endcase
 
-				sex_stack_im_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
-				sex_stack_weight_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
-				sex_stack_cat_psfex_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psfex.ldac'
-				sex_stack_psfex_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psfex.xml'
+					sex_stack_im_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
+					sex_stack_weight_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
+					sex_stack_cat_psfex_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psfex.ldac'
+					sex_stack_psfex_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psfex.xml'
 
-				sex_stack_cat_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psf.ldac'
-				sex_stack_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psf.xml'
+					sex_stack_cat_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psf.ldac'
+					sex_stack_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_psf.xml'
 
-				gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GE (input_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LT (input_fwhm_full[k])[1]/0.2637, n_gv)
-				if n_gv GT 0 then sex_stack_fwhm=mean(input_target[gv].fwhm) $
-				else stop
+					;gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GE (input_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LT (input_fwhm_full[k])[1]/0.2637, n_gv)
 
-				sex_stack_im_low_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[0],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
-				sex_stack_weight_low_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
-				sex_stack_cat_match_low_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_low_fwhm_'+strjoin(string(input_fwhm_full[0],FORMAT='(F0.1)'),'-')+'.ldac'
-				sex_stack_xml_match_low_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_low_fwhm_'+strjoin(string(input_fwhm_full[0],FORMAT='(F0.1)'),'-')+'.xml'
-
-				sex_stack_im_high_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
-				sex_stack_weight_high_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
-				sex_stack_cat_match_high_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_high_fwhm_'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'.ldac'
-				sex_stack_xml_match_high_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_high_fwhm_'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'.xml'
-
-;				sex_stack_cat_psf_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+(input_fwhm_full[k] EQ 99. ? 'ALL':string(input_fwhm_full[k],FORMAT='(F0.1)'))+'_psfex.ldac'
-;				sex_stack_psf_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+(input_fwhm_full[k] EQ 99. ? 'ALL':string(input_fwhm_full[k],FORMAT='(F0.1)'))+'_psfex.xml'
-
-				sex_stack_checkimage_type='BACKGROUND,SEGMENTATION'
-				sex_stack_checkimage_file=strjoin(output_stack_check_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL': strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+['.CHECK_BACK.fits','.CHECK_SEGMENTATION.fits'],',')
-			
-				psfex_stack_cat_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_sex_psfex_stars.ldac'
-				psfex_stack_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_sex_psfex_stars.xml'
-				psfex_stack_psf_file=repstr(psfex_stack_cat_file, '.ldac', '.psf')
-				psfex_check_type = 'RESIDUALS,SNAPSHOTS,SAMPLES'
-				psfex_check_file = strjoin(output_stack_psfex_dir+'/psfex_checkimage'+['.CHECK_RESIDUALS.fits','.CHECK_SNAPSHOTS.fits','.CHECK_SAMPLES.fits'],',')
-				psfex_checkplot_type = 'FWHM,ELLIPTICITY,COUNTS'
-				psfex_checkplot_file = strjoin(output_stack_psfex_dir+'/psfex_checkplot'+['.CHECK_FWHM','.CHECK_ELLIPTICITY','.CHECK_COUNTS'],',')
-				psfex_psfvar_nsnap='14'
-				psfex_psfvar_degrees='3'
-				psfex_basis_type='PIXEL'
-				psfex_basis_number='20'
-				psfex_psf_size='47,47'
-				psfex_psf_sampling='0.8'
-			
-			;	cat_stars_data=mrdfits('catalogs/psfex_stars_v2.fits', 1, cat_stars_h, COLUMNS=['RA','DEC','MAG_AUTO','FLAGS'])
-			;	gv_stars=where(cat_stars_data.flags[0] LE 3 AND cat_stars_data.flags[1] LE 3 AND cat_stars_data.flags[2] LE 3, n_gv_stars)
-;				print, 'Filename is ', psfex_stack_cat_file
-;				print, file_test(psfex_stack_cat_file)
-;				print, file_test(sex_stack_im_file) AND (file_test(psfex_stack_cat_file) EQ 0 OR do_overwrite) 
-
-				print, sex_stack_im_file, file_test(sex_stack_im_file)
-				print, psfex_stack_cat_file, file_test(psfex_stack_cat_file)
-				print
-
-				if file_test(sex_stack_im_file) AND (file_test(psfex_stack_cat_file) EQ 0 OR do_overwrite) then begin
-
-					im_h=headfits(sex_stack_im_file)
-					im_size=long([fxpar(im_h,'NAXIS1'),fxpar(im_h,'NAXIS2')])
+					if input_dither_full[l] EQ 'ALL' then begin
+						case do_fwhm_type of
+							'limit': gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE input_fwhm_full[k]/0.2637, n_gv)
+							'range': gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GE (input_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LT (input_fwhm_full[k])[1]/0.2637, n_gv)
+							else: stop
+						endcase
+					endif else begin
+						case do_fwhm_type of
+							'limit': gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm LE input_fwhm_full[k]/0.2637 AND input_target.dither EQ input_dither_full[l], n_gv)
+							'range': gv=where(input_target.tile EQ tile_uniq[i] AND input_target.filter EQ filter_uniq[j] AND input_target.fwhm GE (input_fwhm_full[k])[0]/0.2637 AND input_target.fwhm LT (input_fwhm_full[k])[1]/0.2637 AND input_target.dither EQ input_dither_full[l], n_gv)
+							else: stop
+						endcase
+					endelse
 				
-					if file_test(sex_stack_cat_psfex_file) EQ 0 OR do_overwrite then begin
-						command='sex "'+sex_stack_im_file+'" -c sex_config/ctio_decam_psfex.sex -PARAMETERS_NAME sex_config/ctio_decam_psfex.param -CATALOG_NAME "'+sex_stack_cat_psfex_file+'" -WEIGHT_IMAGE "'+sex_stack_weight_file+'" -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_psfex_xml_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME "'+sex_stack_checkimage_file+'"'
+					if n_gv GT 0 then sex_stack_fwhm=mean(input_target[gv].fwhm) $
+					else stop
+
+					sex_stack_im_low_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[0],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
+					sex_stack_weight_low_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
+					sex_stack_cat_match_low_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_low_fwhm_'+strjoin(string(input_fwhm_full[0],FORMAT='(F0.1)'),'-')+'.ldac'
+					sex_stack_xml_match_low_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_low_fwhm_'+strjoin(string(input_fwhm_full[0],FORMAT='(F0.1)'),'-')+'.xml'
+
+					sex_stack_im_high_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.fits'
+					sex_stack_weight_high_file=output_stack_swarp_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'.WEIGHT.fits'
+					sex_stack_cat_match_high_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_high_fwhm_'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'.ldac'
+					sex_stack_xml_match_high_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-')+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_match_high_fwhm_'+strjoin(string(input_fwhm_full[-1],FORMAT='(F0.1)'),'-')+'.xml'
+
+	;				sex_stack_cat_psf_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+(input_fwhm_full[k] EQ 99. ? 'ALL':string(input_fwhm_full[k],FORMAT='(F0.1)'))+'_psfex.ldac'
+	;				sex_stack_psf_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+(input_fwhm_full[k] EQ 99. ? 'ALL':string(input_fwhm_full[k],FORMAT='(F0.1)'))+'_psfex.xml'
+
+					sex_stack_checkimage_type='BACKGROUND,SEGMENTATION'
+					sex_stack_checkimage_file=strjoin(output_stack_check_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL': strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+['.CHECK_BACK.fits','.CHECK_SEGMENTATION.fits'],',')
+				
+					psfex_stack_cat_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_sex_psfex_stars.ldac'
+					psfex_stack_xml_file=output_stack_sex_dir+'/ms_tile'+tile_uniq[i]+'_'+filter_uniq[j]+'_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'_dither'+input_dither_full[l]+'_exclude'+do_dither_exclude+'_program'+do_program_plain+'_sex_psfex_stars.xml'
+					psfex_stack_psf_file=repstr(psfex_stack_cat_file, '.ldac', '.psf')
+					psfex_check_type = 'RESIDUALS,SNAPSHOTS,SAMPLES'
+					psfex_check_file = strjoin(output_stack_psfex_dir+'/psfex_checkimage'+['.CHECK_RESIDUALS.fits','.CHECK_SNAPSHOTS.fits','.CHECK_SAMPLES.fits'],',')
+					psfex_checkplot_type = 'FWHM,ELLIPTICITY,COUNTS'
+					psfex_checkplot_file = strjoin(output_stack_psfex_dir+'/psfex_checkplot'+['.CHECK_FWHM','.CHECK_ELLIPTICITY','.CHECK_COUNTS'],',')
+					psfex_psfvar_nsnap='14'
+					psfex_psfvar_degrees='3'
+					psfex_basis_type='PIXEL'
+					psfex_basis_number='20'
+					psfex_psf_size='47,47'
+					psfex_psf_sampling='0.8'
+				
+				;	cat_stars_data=mrdfits('catalogs/psfex_stars_v2.fits', 1, cat_stars_h, COLUMNS=['RA','DEC','MAG_AUTO','FLAGS'])
+				;	gv_stars=where(cat_stars_data.flags[0] LE 3 AND cat_stars_data.flags[1] LE 3 AND cat_stars_data.flags[2] LE 3, n_gv_stars)
+	;				print, 'Filename is ', psfex_stack_cat_file
+	;				print, file_test(psfex_stack_cat_file)
+	;				print, file_test(sex_stack_im_file) AND (file_test(psfex_stack_cat_file) EQ 0 OR do_overwrite) 
+
+					print, sex_stack_im_file, file_test(sex_stack_im_file)
+					print, psfex_stack_cat_file, file_test(psfex_stack_cat_file)
+					print
+
+					if file_test(sex_stack_im_file) AND (file_test(psfex_stack_cat_file) EQ 0 OR do_overwrite) then begin
+
+						im_h=headfits(sex_stack_im_file)
+						im_size=long([fxpar(im_h,'NAXIS1'),fxpar(im_h,'NAXIS2')])
+					
+						if file_test(sex_stack_cat_psfex_file) EQ 0 OR do_overwrite then begin
+							command='sex "'+sex_stack_im_file+'" -c sex_config/ctio_decam_psfex.sex -PARAMETERS_NAME sex_config/ctio_decam_psfex.param -CATALOG_NAME "'+sex_stack_cat_psfex_file+'" -WEIGHT_IMAGE "'+sex_stack_weight_file+'" -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_psfex_xml_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME "'+sex_stack_checkimage_file+'"'
+							print, command
+							spawn, command
+						endif
+
+						filter_sex_cat, sex_stack_cat_psfex_file, psfex_stack_cat_file, class='stars'
+
+						command='psfex '+psfex_stack_cat_file+' -c psfex_config/ctio_decam.psfex'+' -PSF_DIR '+output_stack_psfex_dir+' -WRITE_XML Y -XML_NAME '+psfex_stack_xml_file+' -CHECKIMAGE_TYPE NONE '+' -CHECKIMAGE_NAME '+psfex_check_file+' -CHECKPLOT_DEV PNG -CHECKPLOT_TYPE '+psfex_checkplot_type+' -CHECKPLOT_NAME '+psfex_checkplot_file+' -PSFVAR_NSNAP '+psfex_psfvar_nsnap+' -PSFVAR_DEGREES '+psfex_psfvar_degrees+' -BASIS_TYPE '+psfex_basis_type+' -BASIS_NUMBER '+psfex_basis_number+' -SAMPLE_VARIABILITY 1.,1. -SAMPLE_MAXELLIP 1. -NEWBASIS_TYPE NONE -NEWBASIS_NUMBER 10 -SAMPLEVAR_TYPE NONE -STABILITY_TYPE EXPOSURE -SAMPLE_MINSN 1. -SAMPLE_FWHMRANGE 0.1,10. -SAMPLE_AUTOSELECT N -PSF_SIZE '+psfex_psf_size+' -PSF_SAMPLING '+psfex_psf_sampling+' -PSF_ACCURACY 0.01 -BADPIXEL_FILTER Y -BADPIXEL_NMAX 80'
 						print, command
 						spawn, command
 					endif
 
-					filter_sex_cat, sex_stack_cat_psfex_file, psfex_stack_cat_file, class='stars'
-
-					command='psfex '+psfex_stack_cat_file+' -c psfex_config/ctio_decam.psfex'+' -PSF_DIR '+output_stack_psfex_dir+' -WRITE_XML Y -XML_NAME '+psfex_stack_xml_file+' -CHECKIMAGE_TYPE NONE '+' -CHECKIMAGE_NAME '+psfex_check_file+' -CHECKPLOT_DEV PNG -CHECKPLOT_TYPE '+psfex_checkplot_type+' -CHECKPLOT_NAME '+psfex_checkplot_file+' -PSFVAR_NSNAP '+psfex_psfvar_nsnap+' -PSFVAR_DEGREES '+psfex_psfvar_degrees+' -BASIS_TYPE '+psfex_basis_type+' -BASIS_NUMBER '+psfex_basis_number+' -SAMPLE_VARIABILITY 1.,1. -SAMPLE_MAXELLIP 1. -NEWBASIS_TYPE NONE -NEWBASIS_NUMBER 10 -SAMPLEVAR_TYPE NONE -STABILITY_TYPE EXPOSURE -SAMPLE_MINSN 1. -SAMPLE_FWHMRANGE 0.1,10. -SAMPLE_AUTOSELECT N -PSF_SIZE '+psfex_psf_size+' -PSF_SAMPLING '+psfex_psf_sampling+' -PSF_ACCURACY 0.01 -BADPIXEL_FILTER Y -BADPIXEL_NMAX 80'
-					print, command
-					spawn, command
-				endif
-
-				if file_test(psfex_stack_psf_file) AND ((file_test(sex_stack_cat_file) EQ 0 OR do_overwrite)) then begin
-					command='sex '+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack_psf.param -CATALOG_NAME '+sex_stack_cat_file+' -WEIGHT_IMAGE '+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PSF_NAME '+psfex_stack_psf_file+' -PSF_NMAX 1'
-					print, command
-					spawn, command
-				endif
-
-				case k of
-					0: begin
-						command='sex '+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack.param -CATALOG_NAME '+sex_stack_cat_match_low_file+' -WEIGHT_IMAGE '+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_match_low_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*sex_stack_fwhm, FORMAT='(F0.2)'),',')
+					if file_test(psfex_stack_psf_file) AND ((file_test(sex_stack_cat_file) EQ 0 OR do_overwrite)) then begin
+						command='sex '+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack_psf.param -CATALOG_NAME '+sex_stack_cat_file+' -WEIGHT_IMAGE '+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PSF_NAME '+psfex_stack_psf_file+' -PSF_NMAX 1'
 						print, command
 						spawn, command
-					end
-					else: begin
-						command='sex '+sex_stack_im_low_file+','+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack.param -CATALOG_NAME '+sex_stack_cat_match_low_file+' -WEIGHT_IMAGE '+sex_stack_weight_low_file+','+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_match_low_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*sex_stack_fwhm, FORMAT='(F0.2)'),',')
-						print, command
-						spawn, command
+					endif
 
-						command='sex '+sex_stack_im_high_file+','+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack.param -CATALOG_NAME '+sex_stack_cat_match_high_file+' -WEIGHT_IMAGE '+sex_stack_weight_high_file+','+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_match_high_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*sex_stack_fwhm, FORMAT='(F0.2)'),',')
-						print, command
-						spawn, command
-					end
-				endcase
+					case k of
+						0: begin
+							command='sex '+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack.param -CATALOG_NAME '+sex_stack_cat_match_low_file+' -WEIGHT_IMAGE '+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_match_low_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*sex_stack_fwhm, FORMAT='(F0.2)'),',')
+							print, command
+							spawn, command
+						end
+						else: begin
+							command='sex '+sex_stack_im_low_file+','+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack.param -CATALOG_NAME '+sex_stack_cat_match_low_file+' -WEIGHT_IMAGE '+sex_stack_weight_low_file+','+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_match_low_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*sex_stack_fwhm, FORMAT='(F0.2)'),',')
+							print, command
+							spawn, command
 
-			endfor
+							command='sex '+sex_stack_im_high_file+','+sex_stack_im_file+' -c sex_config/ctio_decam_stack.sex -PARAMETERS_NAME sex_config/ctio_decam_stack.param -CATALOG_NAME '+sex_stack_cat_match_high_file+' -WEIGHT_IMAGE '+sex_stack_weight_high_file+','+sex_stack_weight_file+' -MAG_ZEROPOINT 30. -XML_NAME '+sex_stack_xml_match_high_file+' -CHECKIMAGE_TYPE '+sex_stack_checkimage_type+' -CHECKIMAGE_NAME '+sex_stack_checkimage_file + ' -PHOT_APERTURES '+strjoin(string(2*[1,2,3,4,5]*sex_stack_fwhm, FORMAT='(F0.2)'),',')
+							print, command
+							spawn, command
+						end
+					endcase
+
+				endfor
 			endfor
 		endfor
 	endfor
