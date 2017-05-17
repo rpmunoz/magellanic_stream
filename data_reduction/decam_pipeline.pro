@@ -1181,14 +1181,15 @@ if recipe EQ 'sextractor' then begin
 				else: stop
 			endcase
 		
-;			if n_elements(input_zp) GT 0 then begin
-;				gv=where(input_zp.filter EQ input_target[i].filter AND input_zp.mjd EQ input_target[i].mjd_floor, n_gv)
-;				if n_gv GT 0 then sex_zp=input_zp[gv].zp $
-;				else stop
-;			endif else begin
-;				sex_zp=input_target[i].zp
-;			endelse
-			sex_zp=input_target[i].zp
+
+			if n_elements(input_zp) GT 0 then begin
+				gv=where(input_zp.filter EQ input_target[i].filter AND input_zp.mjd EQ input_target[i].mjd_floor, n_gv)
+				if n_gv GT 0 then sex_zp=input_zp[gv].zp $
+				else stop
+			endif else begin
+				sex_zp=input_target[i].zp
+			endelse
+			;sex_zp=input_target[i].zp
 
 			command = 'sex '+input_target[i].im_file +' -c sex_config/ctio_decam.sex -CATALOG_NAME '+input_target[i].sex_cat_file+' -WEIGHT_IMAGE '+input_target[i].weight_file+' -XML_NAME '+input_target[i].sex_xml_file+' -SATUR_LEVEL '+sex_satur_level+' -MAG_ZEROPOINT '+string(sex_zp,FORMAT='(F0.2)')+' -CHECKIMAGE_TYPE BACKGROUND -CHECKIMAGE_NAME '+input_target[i].sex_check_file+' -PHOT_APERTURES '+ string(2*3*input_target[i].fwhm,FORMAT='(F0.2)')
 
@@ -1508,22 +1509,22 @@ if recipe EQ 'scamp' then begin
 	scamp_mag_bin=0.5
 	scamp_radius_bin=0.2
 
-  if do_overwrite then begin
+	if do_overwrite then begin
 		file_delete, input_target.scamp_cat_file, /noexpand, /allow_non, /quiet
-  	file_delete, input_target.scamp_head_file, /noexpand, /allow_non, /quiet
+  		file_delete, input_target.scamp_head_file, /noexpand, /allow_non, /quiet
 	endif
+
 	if not file_test(scamp_refcat_dir, /directory) then file_mkdir, scamp_refcat_dir, /noexpand_path
 	if not file_test(scamp_dir_out, /directory) then file_mkdir, scamp_dir_out, /noexpand_path
 	loadct, 12
 
 	for i=0L, n_elements(input_target)-1 do begin
-		print, 'SCAMP - Creating file '+input_target[i].scamp_cat_file
 
 		case input_target[i].filter of
 			'u': begin
 				scamp_mag_range=[10.,18.]
 				plot_mag_range=[21,10]
-  			scamp_sn_thresholds='20.,40.0'
+  				scamp_sn_thresholds='20.,40.0'
 				scamp_distort_degrees='4'
 			end
 			'g': begin
@@ -1539,8 +1540,8 @@ if recipe EQ 'scamp' then begin
 				scamp_distort_degrees='4'
 			end
 			'z': begin
-				scamp_mag_range=[15.,22.]
-				plot_mag_range=[25,15]
+				scamp_mag_range=[9.,14.]
+				plot_mag_range=[18,7]
   				scamp_sn_thresholds='20.,40.0'
 				scamp_distort_degrees='4'
 			end
@@ -1553,13 +1554,15 @@ if recipe EQ 'scamp' then begin
 		else scamp_n_ext=0
 		if scamp_n_ext EQ input_target[i].n_chip*2 AND do_overwrite EQ 0 then continue
 
+		print, 'SCAMP - Reading file '+input_target[i].sex_cat_file
+
 		fits_open, input_target[i].sex_cat_file, fcb_in  ; Lee la tabla fits sin intervenerla           
 		fits_read, fcb_in, cat_data0, cat_h0, exten=0 
 ;		fxaddpar, cat_h0, 'FILTER', input_target[i].filter
 		writefits, input_target[i].scamp_cat_file, cat_data0, cat_h0
 
 		for j=0L, input_target[i].n_chip-1 do begin
-			cat_sex=mrdfits(input_target[i].sex_cat_file, 2*(j+1), cat_sex_h, COLUMNS=['NUMBER','FLUX_RADIUS','MAG_AUTO','MAGERR_AUTO','FLAGS','A_IMAGE','B_IMAGE'], /silent)
+			cat_sex=mrdfits(input_target[i].sex_cat_file, 2*(j+1), cat_sex_h, COLUMNS=['NUMBER','FLUX_RADIUS','MAG_AUTO','MAGERR_AUTO','FLAGS','A_IMAGE','B_IMAGE','CLASS_STAR'], /silent)
 			gv_stars=where(cat_sex.mag_auto GT scamp_mag_range[0] and cat_sex.mag_auto LT scamp_mag_range[1] AND cat_sex.flux_radius GT 1.5 AND cat_sex.flags LE 3 AND cat_sex.b_image/cat_sex.a_image GT 0.8, n_gv_stars)
 			if n_gv_stars LT 10 then begin
 				print, 'SCAMP - Error, there is not enough number of stars'
@@ -1590,7 +1593,7 @@ if recipe EQ 'scamp' then begin
 			oplot, cat_sex[gv_stars].flux_radius, cat_sex[gv_stars].mag_auto, psym=1, color=200
 			wait, 0.2
 
-  		fits_read, fcb_in, cat_data1, cat_h1, exten=2*j+1                                   
+  			fits_read, fcb_in, cat_data1, cat_h1, exten=2*j+1                                   
 			fits_read, fcb_in, cat_data2, cat_h2, exten=2*j+2
 
 ;			temp_filter=bytarr(80)
@@ -1605,13 +1608,14 @@ if recipe EQ 'scamp' then begin
 			cat_data2=cat_data2[*,[gv_stars]]
 			fxaddpar, cat_h2, 'NAXIS2', (size(cat_data2, /dim))[1]
 
-  		fits_open, input_target[i].scamp_cat_file, fcb_out, /append
-		  fits_write, fcb_out, cat_data1, cat_h1
+			print, 'SCAMP - Creating file '+input_target[i].scamp_cat_file
+  			fits_open, input_target[i].scamp_cat_file, fcb_out, /append
+		  	fits_write, fcb_out, cat_data1, cat_h1
 			fits_write, fcb_out, cat_data2, cat_h2
-  		fits_close, fcb_out
+  			fits_close, fcb_out
 
 		endfor
-  	fits_close, fcb_in
+  		fits_close, fcb_in
 	endfor
 
 	forprint, input_target.scamp_cat_file, textout=scamp_list_file, FORMAT='(A)', /NOCOMMENT
@@ -1674,6 +1678,7 @@ if recipe EQ 'swarp' then begin
 	swarp_verbose='NORMAL'
 	swarp_resample_do='Y'
 	swarp_resample_dir='/Volumes/Data1/temp/resample'
+
 	if not file_test(swarp_resample_dir, /directory) then file_mkdir, swarp_resample_dir, /noexpand_path
 
 	tile_uniq=input_target[uniq(input_target.tile, sort(input_target.tile))].tile
@@ -1724,8 +1729,10 @@ if recipe EQ 'swarp' then begin
  			endif
 
 			for k=0L, n_elements(input_fwhm_full)-1 do begin
+
 				print
 				print, 'SWARP - Filtering FWHM of ', input_fwhm_full[k]
+				swarp_resample_suffix='.resamp_fwhm'+( total(input_fwhm_full[k] EQ 99.) GT 0 ? 'ALL':strjoin(string(input_fwhm_full[k],FORMAT='(F0.1)'),'-'))+'.fits'
 
 				for l=0L, n_elements(input_dither_full)-1 do begin
 					print
@@ -1773,7 +1780,7 @@ if recipe EQ 'swarp' then begin
 		
 						forprint, input_target[gv].swarp_im_file, textout=swarp_list_file, FORMAT='(A)', /NOCOMMENT
 						if file_test(swarp_im_out) EQ 0 OR do_overwrite then begin
-							command='swarp @'+swarp_list_file+' -c swarp_config/ctio_decam.swarp'+' -IMAGEOUT_NAME "'+swarp_im_out+'" -WEIGHTOUT_NAME "'+swarp_weight_out+'" -COMBINE_TYPE '+swarp_combine_type+' -RESAMPLE '+swarp_resample_do+' -RESAMPLE_DIR '+swarp_resample_dir+' -SATLEV_DEFAULT 35000 -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_SUFFIX '+swarp_weight_suffix+' -WEIGHT_THRESH 0. -RESCALE_WEIGHTS N -BLANK_BADPIXELS Y -WRITE_XML Y -XML_NAME '+swarp_xml_file+' -VERBOSE_TYPE ' +swarp_verbose+' -RESAMPLING_TYPE '+swarp_resampling_type+' -SUBTRACT_BACK Y -BACK_SIZE 384'
+							command='swarp @'+swarp_list_file+' -c swarp_config/ctio_decam.swarp'+' -IMAGEOUT_NAME "'+swarp_im_out+'" -WEIGHTOUT_NAME "'+swarp_weight_out+'" -COMBINE_TYPE '+swarp_combine_type+' -RESAMPLE '+swarp_resample_do+' -RESAMPLE_DIR '+swarp_resample_dir+' -RESAMPLE_SUFFIX '+swarp_resample_suffix+' -SATLEV_DEFAULT 35000 -WEIGHT_TYPE MAP_WEIGHT -WEIGHT_SUFFIX '+swarp_weight_suffix+' -WEIGHT_THRESH 0. -RESCALE_WEIGHTS N -BLANK_BADPIXELS Y -WRITE_XML Y -XML_NAME '+swarp_xml_file+' -VERBOSE_TYPE ' +swarp_verbose+' -RESAMPLING_TYPE '+swarp_resampling_type+' -SUBTRACT_BACK Y -BACK_SIZE 384'
 							print, command
 							spawn, command
 						endif
