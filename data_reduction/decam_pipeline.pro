@@ -93,7 +93,7 @@ survey_sequence = { seq1:['1','1'], seq2:['2','2'], seq3:['3','3'], seq4:['4','4
 for i=0L, n_elements(do_program)-1 do begin
 
 	if file_test('survey_target_'+do_program[i]+'.dat') AND recipe NE 'database' then begin
-		readcol, 'survey_target_'+do_program[i]+'.dat', temp_im_orig_file, temp_filter, temp_tile, temp_dither, temp_weight_orig_file, temp_zp, temp_fwhm, temp_mjd, temp_exptime, temp_n_chip, FORMAT='A,A,A,A,A,F,F,D,F,I', COMMENT='#'
+		readcol, 'survey_target_'+do_program[i]+'.dat', temp_im_orig_file, temp_filter, temp_tile, temp_dither, temp_weight_orig_file, temp_zp, temp_fwhm, temp_mjd, temp_exptime, temp_n_chip, FORMAT='A,A,A,A,A,F,F,D,F,I', COMMENT='#', /SILENT
 		n_survey_info=n_elements(temp_im_orig_file)
 		create_struct, temp_input_target, '', ['im_orig_file','program','filter','tile','dither','weight_orig_file','mjd','mjd_floor','zp','im_file','weight_file','fwhm','sky','exptime','n_chip','sex_cat_file','sex_xml_file','sex_check_file','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file','sex_zp_file','stack_flag'], 'A,A,A,A,A,A,D,D,F,A,A,F,F,F,I,A,A,A,A,A,A,A,A,A,A', dim=n_survey_info
 		temp_input_target.im_orig_file=input_im_dir[i]+'/'+repstr(temp_im_orig_file,'.fits.fz','.fits')
@@ -238,7 +238,7 @@ for i=0L, n_elements(do_program)-1 do begin
 
 	if file_test('survey_iq_'+do_program[i]+'.dat') AND recipe NE 'iq' then begin
 
-		readcol, 'survey_iq_'+do_program[i]+'.dat', temp_im_file, temp_filter, temp_tile, temp_dither, temp_sky, temp_fwhm, FORMAT='A,A,A,A,F,F', COMMENT='#'
+		readcol, 'survey_iq_'+do_program[i]+'.dat', temp_im_file, temp_filter, temp_tile, temp_dither, temp_sky, temp_fwhm, FORMAT='A,A,A,A,F,F', COMMENT='#', /SILENT
 		n_survey=n_elements(temp_im_file)
 		
 		if n_survey GT 0 then begin
@@ -258,7 +258,7 @@ endfor
 
 if file_test('survey_iq_manual.dat') AND n_elements(input_iq) GT 0 then begin
 	print, 'Reading FWHM from IQ manual file'
-	readcol, 'survey_iq_manual.dat', temp_im_file, temp_filter, temp_tile, temp_dither, temp_sky, temp_exptime, temp_fwhm, FORMAT='A,A,A,A,F,F,F', COMMENT='#'
+	readcol, 'survey_iq_manual.dat', temp_im_file, temp_filter, temp_tile, temp_dither, temp_sky, temp_exptime, temp_fwhm, FORMAT='A,A,A,A,F,F,F', COMMENT='#', /SILENT
 
 	for j=0L, n_elements(temp_im_file)-1 do begin
 		gv=where(input_iq.im_file EQ temp_im_file[j], n_gv)
@@ -304,7 +304,7 @@ endif
 for i=0L, n_elements(do_program)-1 do begin
 
 	if file_test('survey_calib_'+do_program[i]+'.dat') AND recipe NE 'database' then begin
-		readcol, 'survey_calib_'+do_program[i]+'.dat', temp_im_orig_file, temp_object, temp_filter, temp_weight_orig_file, temp_zp, temp_fwhm, temp_mjd, temp_exptime, temp_n_chip, temp_photflag, FORMAT='A,A,A,A,F,F,D,F,I,A', COMMENT='#'
+		readcol, 'survey_calib_'+do_program[i]+'.dat', temp_im_orig_file, temp_object, temp_filter, temp_weight_orig_file, temp_zp, temp_fwhm, temp_mjd, temp_exptime, temp_n_chip, temp_photflag, FORMAT='A,A,A,A,F,F,D,F,I,A', COMMENT='#', /SILENT
 		n_survey=n_elements(temp_im_orig_file)
 		create_struct, temp_input_calib, '', ['im_orig_file','object','program','filter','tile','weight_orig_file','skip','mjd','mjd_floor','zp','airmass','im_file','weight_file','fwhm','exptime','n_chip','sex_dir','sex_cat_file','sex_xml_file','sex_check_file','sex_zp_file','sex_zp_full_file','photflag','scamp_cat_file','scamp_head_file','scamp_ahead_file','swarp_im_file','swarp_head_file'], 'A,A,A,A,A,A,A,D,D,F,F,A,A,F,F,I,A,A,A,A,A,A,A,A,A,A,A,A', dim=n_survey
 		temp_input_calib.im_orig_file=input_calib_dir[i]+'/'+repstr(temp_im_orig_file,'.fits.fz','.fits')
@@ -367,7 +367,7 @@ endif
 for i=0L, n_elements(do_program)-1 do begin
 
 	if file_test('survey_zp_'+do_program[i]+'.dat') then begin
-		readcol, 'survey_zp_'+do_program[i]+'.dat', temp_mjd, temp_filter, temp_zp, temp_k, temp_zp_error, temp_k_error, temp_photflag, FORMAT='F,A,F,F,F,F,A', COMMENT='#'
+		readcol, 'survey_zp_'+do_program[i]+'.dat', temp_mjd, temp_filter, temp_zp, temp_k, temp_zp_error, temp_k_error, temp_photflag, FORMAT='F,A,F,F,F,F,A', COMMENT='#', /SILENT
 		n_survey=n_elements(temp_mjd)
 		create_struct, temp_input_zp, '', ['mjd','filter','zp','k','zp_error','k_error','photflag'], 'F,A,F,F,F,F,A', dim=n_survey
 		temp_input_zp.mjd=temp_mjd
@@ -886,7 +886,7 @@ if recipe EQ 'compute zp' then begin
 
 			cat_file=file_search('standard/southern_stars', '*.dat.trimmed')
 			for j=0L, n_elements(cat_file)-1 do begin
-				readcol, cat_file[j], id, ra, dec, mag_u, mag_u_err, mag_u_n, mag_g, mag_g_err, mag_g_n, mag_r, mag_r_err, mag_r_n, mag_i, mag_i_err, mag_i_n, mag_z, mag_z_err, mag_z_n, FORMAT='A,A,A,F,F,I,F,F,I,F,F,I,F,F,I,F,F,I,X,X', comment='#'
+				readcol, cat_file[j], id, ra, dec, mag_u, mag_u_err, mag_u_n, mag_g, mag_g_err, mag_g_n, mag_r, mag_r_err, mag_r_n, mag_i, mag_i_err, mag_i_n, mag_z, mag_z_err, mag_z_n, FORMAT='A,A,A,F,F,I,F,F,I,F,F,I,F,F,I,F,F,I,X,X', comment='#', /SILENT
 				create_struct, cat_ref_partial, '', ['ra','dec','mag','magerr'], 'F,F,5F,5F', dim=n_elements(id)
 
 				cat_ref_partial.ra=tenv(ra)*360./24
@@ -1063,7 +1063,7 @@ if recipe EQ 'compute zp' then begin
 	for i=0L, n_gv_phot-1 do begin
 		print, 'Processing file ', input_calib[gv_phot[i]].sex_zp_file
 
-		readcol, input_calib[gv_phot[i]].sex_zp_file, temp_ext, temp_decam_zp, temp_airmass, temp_zp, temp_zperr, temp_zp_nstars, temp_fwhm, FORMAT='I,F,F,F,F,I,F', COUNT=n_lines
+		readcol, input_calib[gv_phot[i]].sex_zp_file, temp_ext, temp_decam_zp, temp_airmass, temp_zp, temp_zperr, temp_zp_nstars, temp_fwhm, FORMAT='I,F,F,F,F,I,F', COUNT=n_lines, /SILENT
 		if n_lines GT 0 then begin
 			create_struct, temp_struct, '', ['ext','zp','airmass','filter','mjd','photflag'], 'I,F,F,A,F,A', dim=n_elements(temp_ext)
 			temp_struct.ext=temp_ext
@@ -1077,7 +1077,7 @@ if recipe EQ 'compute zp' then begin
 		endif
 
 		if n_lines GT 0 then begin
-			readcol, input_calib[gv_phot[i]].sex_zp_full_file, temp_ext, temp_id, temp_ra, temp_dec, temp_flux_aper, temp_flux_auto, temp_mag_ref, temp_zp, temp_airmass, FORMAT='I,I,F,F,D,D,F,F,F', COUNT=n_lines
+			readcol, input_calib[gv_phot[i]].sex_zp_full_file, temp_ext, temp_id, temp_ra, temp_dec, temp_flux_aper, temp_flux_auto, temp_mag_ref, temp_zp, temp_airmass, FORMAT='I,I,F,F,D,D,F,F,F', COUNT=n_lines, /SILENT
 			create_struct, temp_struct, '', ['ext','zp','airmass','filter','mjd'], 'I,F,F,A,F', dim=n_elements(temp_ext)
 			temp_struct.ext=temp_ext
 			temp_struct.zp=temp_zp
@@ -1237,7 +1237,7 @@ if recipe EQ 'iq' then begin
 
 		log_file='survey_iq_'+input_target[i].program+'.dat'
 		log_file_copy=input_dir+'/'+input_target[i].program+'/survey_iq_'+input_target[i].program+'.dat'
-		readcol, log_file, temp_im_file, temp_filter, temp_tile, temp_dither, temp_sky, temp_fwhm, FORMAT='A,A,A,A,F,F', /silent
+		readcol, log_file, temp_im_file, temp_filter, temp_tile, temp_dither, temp_sky, temp_fwhm, FORMAT='A,A,A,A,F,F', /SILENT
 		if n_elements(temp_im_file) GT 0 then begin		
 			gv_im_file=where(temp_im_file EQ input_target[i].im_file, n_gv_im_file)
 			if n_gv_im_file GT 0 then continue
@@ -2051,8 +2051,9 @@ if recipe EQ 'report' then begin
 				endcase
 				
 				gv=gv[sort(input_target[gv].fwhm)]
-				;print, 'Filename		Tile		Filter		FWHM(arsec)'
-				;forprint, input_target[gv].im_file, input_target[gv].tile , input_target[gv].filter, input_target[gv].fwhm*0.2637, input_target[gv].exptime, textout=2, format='A,2X,A,2X,A,2X,F0.2,2X,F0.1'
+				print, FORMAT='(%"\nFilename\t\t\t\t\t\t\t\t Tile  Filter  FWHM(arsec)  Exptime(sec)")'
+				forprint, input_target[gv].im_file, input_target[gv].tile , input_target[gv].filter, input_target[gv].fwhm*0.2637, input_target[gv].exptime, textout=2, format='A,2X,A,2X,A,2X,F0.2,2X,F0.1'
+				print
 
 				exptime_total=total(input_target[gv].exptime)
 				exptime_uniq=input_target[gv[uniq(input_target[gv].exptime, sort(input_target[gv].exptime))]].exptime
@@ -2080,68 +2081,69 @@ if recipe EQ 'report' then begin
 		print
 	endfor
 
-stop
 
-if do_fwhm EQ 99. then plot_yrange=[0,24] else plot_yrange=[0,16]
-gv=where(input_iq.sky LT 25000. AND input_iq.fwhm GT 0. AND input_iq.FWHM*0.2637 LT do_fwhm, n_gv)
-input_iq=input_iq[gv]
-
-im_exptime=list()
-for i=0L, n_elements(input_iq)-1 do begin
-	im_h=headfits(input_iq[i].im_file)
-	im_exptime.add, fxpar(im_h, 'EXPTIME')
-endfor
-
-im_exptime=im_exptime.toarray(type='float')
-
-forprint, input_iq.im_file, im_exptime, format='A,4X,F0.1', textout=2
-
-openw, lun, 'summary_survey_iq.dat', /get_lun
-printf, lun, '# FILE  FILTER  TILE  DITHER  SKY_LEVEL  FWHM  EXPTIME'
-for i=0L, n_elements(input_iq)-1 do begin
-	printf, lun, input_iq[i].im_file, input_iq[i].filter, input_iq[i].tile, input_iq[i].dither, input_iq[i].sky, input_iq[i].fwhm, im_exptime[i], format='(A,4X,A,4X,A,4X,A,4X,F0.1,4X,F0.1,4X,F0.1)'
-endfor
-free_lun, lun
-
-tile_uniq=input_iq[uniq(input_iq.tile, sort(input_iq.tile))].tile
-filter_uniq=input_iq[uniq(input_iq.filter, sort(input_iq.filter))].filter
-exptime_uniq=im_exptime[uniq(im_exptime, sort(im_exptime))]
-
-;for i=0L, n_elements(tile_uniq)-1 do begin
-	for j=0L, n_elements(filter_uniq)-1 do begin
-				
-;		gv=where(input_iq.tile EQ tile_uniq[i] AND input_iq.filter EQ filter_uniq[j], n_gv)
-		gv=where(input_iq.filter EQ filter_uniq[j], n_gv)
-
-		if n_gv GT 0 then begin			
-			exptime_uniq=im_exptime[gv[uniq(im_exptime[gv], sort(im_exptime[gv]))]]
-			print, filter_uniq[j], exptime_uniq
-
-      cgwindow, wxsize=800, wysize=300*n_elements(exptime_uniq);, WMulti=[0,1,n_elements(plot_extname)], WOXMargin=[2,6], WOYMargin=[2,2]
-      plot_pos = cgLayout([1,n_elements(exptime_uniq)], OXMargin=[8,6], OYMargin=[2,2], XGap=1, YGap=2)
-
-			for k=0L, n_elements(exptime_uniq)-1 do begin
-
-;				gv=where(input_iq.tile EQ tile_uniq[i] AND input_iq.filter EQ filter_uniq[j] AND im_exptime EQ exptime_uniq[k], n_gv)
-				gv=where(input_iq.filter EQ filter_uniq[j] AND im_exptime EQ exptime_uniq[k], n_gv)
-
-				if n_gv GT 0 then begin			
-					cghistoplot, fix(input_iq[gv].tile)-0.5, bin=1., position=plot_pos[*,k], /fill, POLYCOLOR='sky blue', MININPUT=0., /addcmd, /noerase, xtickvalues=0.5+indgen(9), xticknames=(k EQ n_elements(exptime_uniq)-1) ? string(1+indgen(9),FORMAT='(I0)') : replicate(' ',9), xticks=8, xrange=[-1,10], yrange=plot_yrange, title='Filter '+filter_uniq[j]+' EXPTIME '+string(exptime_uniq[k],FORMAT='(F0.1)'), charsize=1., yticklen=1., ygridstyle=1
-				endif $
-				else begin
-;					cghistoplot, [0], /addcmd, /noerase, xrange=[-1,10], yrange=plot_yrange
-				endelse
-
-			endfor
-	    cgcontrol, output='results/magellanic_histogram_filter'+filter_uniq[j]+'_fwhm'+(do_fwhm EQ 99. ? 'ALL':string(do_fwhm,FORMAT='(F0.1)'))+'.pdf'
-
-
-		endif
-
-	endfor
-;endfor
-
-cgdelete, /all
+;	stop
+;
+;	if do_fwhm EQ 99. then plot_yrange=[0,24] else plot_yrange=[0,16]
+;	gv=where(input_iq.sky LT 25000. AND input_iq.fwhm GT 0. AND input_iq.FWHM*0.2637 LT do_fwhm, n_gv)
+;	input_iq=input_iq[gv]
+;
+;	im_exptime=list()
+;	for i=0L, n_elements(input_iq)-1 do begin
+;		im_h=headfits(input_iq[i].im_file)
+;		im_exptime.add, fxpar(im_h, 'EXPTIME')
+;	endfor
+;
+;	im_exptime=im_exptime.toarray(type='float')
+;
+;	forprint, input_iq.im_file, im_exptime, format='A,4X,F0.1', textout=2
+;
+;	openw, lun, 'summary_survey_iq.dat', /get_lun
+;	printf, lun, '# FILE  FILTER  TILE  DITHER  SKY_LEVEL  FWHM  EXPTIME'
+;	for i=0L, n_elements(input_iq)-1 do begin
+;		printf, lun, input_iq[i].im_file, input_iq[i].filter, input_iq[i].tile, input_iq[i].dither, input_iq[i].sky, input_iq[i].fwhm, im_exptime[i], format='(A,4X,A,4X,A,4X,A,4X,F0.1,4X,F0.1,4X,F0.1)'
+;	endfor
+;	free_lun, lun
+;
+;	tile_uniq=input_iq[uniq(input_iq.tile, sort(input_iq.tile))].tile
+;	filter_uniq=input_iq[uniq(input_iq.filter, sort(input_iq.filter))].filter
+;	exptime_uniq=im_exptime[uniq(im_exptime, sort(im_exptime))]
+;
+;	;for i=0L, n_elements(tile_uniq)-1 do begin
+;		for j=0L, n_elements(filter_uniq)-1 do begin
+;					
+;	;		gv=where(input_iq.tile EQ tile_uniq[i] AND input_iq.filter EQ filter_uniq[j], n_gv)
+;			gv=where(input_iq.filter EQ filter_uniq[j], n_gv)
+;
+;			if n_gv GT 0 then begin			
+;				exptime_uniq=im_exptime[gv[uniq(im_exptime[gv], sort(im_exptime[gv]))]]
+;				print, filter_uniq[j], exptime_uniq
+;
+;	      cgwindow, wxsize=800, wysize=300*n_elements(exptime_uniq);, WMulti=[0,1,n_elements(plot_extname)], WOXMargin=[2,6], WOYMargin=[2,2]
+;	      plot_pos = cgLayout([1,n_elements(exptime_uniq)], OXMargin=[8,6], OYMargin=[2,2], XGap=1, YGap=2)
+;
+;				for k=0L, n_elements(exptime_uniq)-1 do begin
+;
+;	;				gv=where(input_iq.tile EQ tile_uniq[i] AND input_iq.filter EQ filter_uniq[j] AND im_exptime EQ exptime_uniq[k], n_gv)
+;					gv=where(input_iq.filter EQ filter_uniq[j] AND im_exptime EQ exptime_uniq[k], n_gv)
+;
+;					if n_gv GT 0 then begin			
+;						cghistoplot, fix(input_iq[gv].tile)-0.5, bin=1., position=plot_pos[*,k], /fill, POLYCOLOR='sky blue', MININPUT=0., /addcmd, /noerase, xtickvalues=0.5+indgen(9), xticknames=(k EQ n_elements(exptime_uniq)-1) ? string(1+indgen(9),FORMAT='(I0)') : replicate(' ',9), xticks=8, xrange=[-1,10], yrange=plot_yrange, title='Filter '+filter_uniq[j]+' EXPTIME '+string(exptime_uniq[k],FORMAT='(F0.1)'), charsize=1., yticklen=1., ygridstyle=1
+;					endif $
+;					else begin
+;	;					cghistoplot, [0], /addcmd, /noerase, xrange=[-1,10], yrange=plot_yrange
+;					endelse
+;
+;				endfor
+;		    cgcontrol, output='results/magellanic_histogram_filter'+filter_uniq[j]+'_fwhm'+(do_fwhm EQ 99. ? 'ALL':string(do_fwhm,FORMAT='(F0.1)'))+'.pdf'
+;
+;
+;			endif
+;
+;		endfor
+;	;endfor
+;
+;	cgdelete, /all
 
 endif
 
