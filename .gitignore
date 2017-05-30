@@ -1,0 +1,18 @@
+# IPython Notebook
+.ipynb_checkpoints
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+*.egg-info/
+.installed.cfg
+*.egg
+
+# FITS
+*.fits
