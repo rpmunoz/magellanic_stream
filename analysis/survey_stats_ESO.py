@@ -6,8 +6,6 @@ from sklearn.cluster import MeanShift, estimate_bandwidth
 from astropy.io import fits
 
 survey_file = 'data/MS_VISTA_P98.csv'
-#im_folder= '/Volumes/RAID/Magellanic_stream/VISTA/P98/raw_data'
-#im_pattern = '*st.fit'
 im_folder= '/mnt/data2/ESO/raw'
 im_pattern = '*.fits.fz'
 
